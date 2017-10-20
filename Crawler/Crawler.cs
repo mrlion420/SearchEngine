@@ -21,30 +21,29 @@ namespace Crawler
 
         protected override void OnStart(string[] args)
         {
-            Logger log = new Logger(@"D:\log.txt");
+            Logger log = new Logger(Directory.GetCurrentDirectory() + @"\log.txt");
             try
             {
-                string url = @"D:\Test\";
+                string url = Directory.GetCurrentDirectory();
+                string sql = string.Empty;
                 string[] filePaths = Directory.GetFiles(url, "*.txt");
                 Dictionary<string, string> wordDict = new Dictionary<string, string>();
 
-                string dbName = "searchEngine.db";
+                string dbName = Directory.GetCurrentDirectory()  + @"\searchEngine.db";
                 if (!File.Exists(dbName))
                 {
-                    log.write("create db");
                     SQLiteConnection.CreateFile(dbName);
+                    sql = @"create table documents(
+                    documentId integer not null primary key autoincrement,
+                    documentName varchar not null
+                    )";
                 }
 
                 SQLiteConnection sqlConnection = new SQLiteConnection("DataSource=" + dbName);
                 sqlConnection.Open();
-                string sql = @"create table documents(
-            documentId integer not null primary key autoincrement,
-            documentName varchar not null
-            )";
 
                 SQLiteCommand command = new SQLiteCommand(sql, sqlConnection);
                 command.ExecuteNonQuery();
-
 
                 foreach (string filePath in filePaths)
                 {
@@ -66,6 +65,9 @@ namespace Crawler
                         }
                     }
                 }
+
+                sqlConnection.Close();
+
             }catch(Exception ex)
             {
                 log.write(ex.ToString());
