@@ -9,9 +9,6 @@ namespace Crawler
 {
     class FileHelper
     {
-        public void parseDocument(File file)
-        {
-
-        }
+        
     }
 }
