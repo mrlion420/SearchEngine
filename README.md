@@ -1,5 +1,6 @@
 # SearchEngine
 Git Usage
+
 Step 1 : Always "Pull" from master branch 
 
 Step 2 : Make a new branch naming the branch such as "Indexing, search funciton, page ranking funciton, etc. "
