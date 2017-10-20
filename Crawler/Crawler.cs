@@ -28,22 +28,21 @@ namespace Crawler
                 string sql = string.Empty;
                 string[] filePaths = Directory.GetFiles(url, "*.txt");
                 Dictionary<string, string> wordDict = new Dictionary<string, string>();
+                SQLiteCommand command;
+                SQLiteConnection sqlConnection;
 
-                string dbName = Directory.GetCurrentDirectory()  + @"\searchEngine.db";
+                string dbName = Directory.GetCurrentDirectory() + @"\searchEngine.db";
+                // Check if database exists or not
                 if (!File.Exists(dbName))
                 {
-                    SQLiteConnection.CreateFile(dbName);
-                    sql = @"create table documents(
-                    documentId integer not null primary key autoincrement,
-                    documentName varchar not null
-                    )";
+                    sqlConnection = InitializeDatabase(dbName);
                 }
-
-                SQLiteConnection sqlConnection = new SQLiteConnection("DataSource=" + dbName);
-                sqlConnection.Open();
-
-                SQLiteCommand command = new SQLiteCommand(sql, sqlConnection);
-                command.ExecuteNonQuery();
+                else
+                {
+                    // Connect to Database if database exists
+                    sqlConnection = new SQLiteConnection("DataSource=" + dbName);
+                    sqlConnection.Open();
+                }
 
                 foreach (string filePath in filePaths)
                 {
@@ -68,15 +67,45 @@ namespace Crawler
 
                 sqlConnection.Close();
 
-            }catch(Exception ex)
+            } catch (Exception ex)
             {
                 log.write(ex.ToString());
             }
-           
+
         }
 
         protected override void OnStop()
         {
+        }
+
+        protected SQLiteConnection InitializeDatabase(string databaseName)
+        {
+            // Create new database 
+            SQLiteConnection.CreateFile(databaseName);
+            SQLiteConnection sqlConnection = new SQLiteConnection("DataSource=" + databaseName);
+            SQLiteCommand command;
+
+            sqlConnection.Open();
+            // Create documents table
+            string createTableSQL =
+                    @"create table documents(
+                        documentId integer not null primary key autoincrement,
+                        documentName varchar not null
+                    )";
+
+            command = new SQLiteCommand(createTableSQL, sqlConnection);
+            command.ExecuteNonQuery();
+            // Create reverseIndex table
+            createTableSQL =
+                @"create table reverseIndex(
+                    term varchar not null primary key,
+                    position varchar not null
+                    )";
+
+            command = new SQLiteCommand(createTableSQL, sqlConnection);
+            command.ExecuteNonQuery();
+
+            return sqlConnection;
         }
     }
 }
