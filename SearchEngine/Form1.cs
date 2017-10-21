@@ -21,58 +21,148 @@ namespace SearchEngine
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            Logger log = new Logger(Directory.GetCurrentDirectory() + @"\log.txt");
-            try
+            string url = Directory.GetCurrentDirectory();
+            string sql = string.Empty;
+            string[] filePaths = Directory.GetFiles(url, "*.txt");
+            Dictionary<string, string> wordDict = new Dictionary<string, string>();
+            Dictionary<string, bool> isDocumentIdInsertedDict = new Dictionary<string, bool>();
+
+            SQLiteCommand command;
+            SQLiteConnection sqlConnection;
+
+            string dbName = Directory.GetCurrentDirectory() + @"\searchEngine.db";
+            // Check if database exists or not
+            if (!File.Exists(dbName))
             {
-                string url = Directory.GetCurrentDirectory();
-                string[] filePaths = Directory.GetFiles(url, "*.txt");
-                Dictionary<string, string> wordDict = new Dictionary<string, string>();
-
-                string dbName = Directory.GetCurrentDirectory() + @"\test.db";
-                if (!File.Exists(dbName))
-                {
-                    log.write("create db");
-                    SQLiteConnection.CreateFile(dbName);
-                }
-
-                SQLiteConnection sqlConnection = new SQLiteConnection("DataSource=" + dbName);
+                sqlConnection = InitializeDatabase(dbName);
+            }
+            else
+            {
+                // Connect to Database if database exists
+                sqlConnection = new SQLiteConnection("DataSource=" + dbName);
                 sqlConnection.Open();
-                string sql = @"create table documents(
-            documentId integer not null primary key autoincrement,
-            documentName varchar not null
-            )";
-
-                SQLiteCommand command = new SQLiteCommand(sql, sqlConnection);
-                command.ExecuteNonQuery();
+            }
 
 
-                foreach (string filePath in filePaths)
+            wordDict = ParseDocuments(filePaths, sqlConnection, wordDict);
+
+            using (SQLiteTransaction transaction = sqlConnection.BeginTransaction())
+            {
+                foreach (KeyValuePair<string, string> keyValuePair in wordDict)
                 {
-                    sql = "insert into documents (documentName) values (" + filePath + ")";
+                    string key = keyValuePair.Key;
+                    string value = keyValuePair.Value;
+
+                    sql = "insert into reverseIndex (term, position) values ('" + key + "','" + value + "')";
                     command = new SQLiteCommand(sql, sqlConnection);
                     command.ExecuteNonQuery();
+                }
 
-                    string[] stringArray = File.ReadAllText(filePath).Split(' ');
-                    for (int i = 0; i < stringArray.Length; i++)
+                transaction.Commit();
+            }
+
+            sqlConnection.Close();
+
+        }
+        protected SQLiteConnection InitializeDatabase(string databaseName)
+        {
+            // Create new database 
+            SQLiteConnection.CreateFile(databaseName);
+            SQLiteConnection sqlConnection = new SQLiteConnection("DataSource=" + databaseName);
+            SQLiteCommand command;
+
+            sqlConnection.Open();
+            // Create documents table
+            string createTableSQL =
+                    @"create table documents(
+                        documentId integer not null primary key autoincrement,
+                        documentName varchar not null
+                    )";
+
+            command = new SQLiteCommand(createTableSQL, sqlConnection);
+            command.ExecuteNonQuery();
+            // Create reverseIndex table
+            createTableSQL =
+                @"create table reverseIndex(
+                    term varchar not null primary key,
+                    position varchar not null
+                    )";
+
+            command = new SQLiteCommand(createTableSQL, sqlConnection);
+            command.ExecuteNonQuery();
+
+            return sqlConnection;
+        }
+        public Dictionary<string, string> ParseDocuments(string[] filePaths, SQLiteConnection sqlConnection, Dictionary<string, string> wordDict)
+        {
+            string[] stopWords = new string[] { ",", ".", ";", ":", "'", "\\", "/", "|", "_" };
+            string sql = string.Empty;
+            SQLiteCommand command;
+            foreach (string filePath in filePaths)
+            {
+                
+                long documentId = 0;
+                HashSet<string> isDocumentIdInsertedForWord = new HashSet<string>();
+
+                sql = "insert into documents (documentName) values ('" + filePath + "')";
+                command = new SQLiteCommand(sql, sqlConnection);
+                command.ExecuteNonQuery();
+
+                sql = "select documentId from documents where documentName = '" + filePath + "'";
+                command = new SQLiteCommand(sql, sqlConnection);
+                SQLiteDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    documentId = Convert.ToInt64(reader["documentId"]);
+                }
+
+                string[] stringArray = File.ReadAllText(filePath).Split(' ');
+                for (int i = 0; i < stringArray.Length; i++)
+                {
+                    string resultString = string.Empty;
+
+                    string word = stringArray[i].ToLower();
+                    word = RemoveStopWords(word, stopWords);
+                 
+                    if (wordDict.ContainsKey(word))
                     {
-                        string word = stringArray[i];
-                        if (wordDict.ContainsKey(word))
+                        if (isDocumentIdInsertedForWord.Contains(word))
                         {
-                            wordDict[word] = "," + i;
+                            resultString = "," + i;
                         }
                         else
                         {
-                            wordDict.Add(word, i.ToString());
+                            resultString = ";" + documentId + ":" + i;
+                            isDocumentIdInsertedForWord.Add(word);
                         }
+                        // += the resulting string
+                        wordDict[word] += resultString;
                     }
+                    else
+                    {
+                        resultString = documentId + ":" + i;
+                        wordDict.Add(word, resultString);
+                        isDocumentIdInsertedForWord.Add(word);
+                        
+                    }
+                    
                 }
-                sqlConnection.Close();
-            }
-            catch (Exception ex)
-            {
-                log.write(ex.ToString());
             }
 
+            return wordDict;
+        }
+
+        public string RemoveStopWords(string word, string[] stopWords)
+        {
+            foreach(string stopWord in stopWords)
+            {
+                if (word.Contains(stopWord))
+                {
+                    word = word.Replace(stopWord, "");
+                }
+            }
+
+            return word;
         }
     }
 }
