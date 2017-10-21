@@ -43,7 +43,6 @@ namespace SearchEngine
                 sqlConnection.Open();
             }
 
-
             wordDict = ParseDocuments(filePaths, sqlConnection, wordDict);
 
             using (SQLiteTransaction transaction = sqlConnection.BeginTransaction())
@@ -76,7 +75,8 @@ namespace SearchEngine
             string createTableSQL =
                     @"create table documents(
                         documentId integer not null primary key autoincrement,
-                        documentName varchar not null
+                        documentName varchar not null,
+                        totalWords integer not null
                     )";
 
             command = new SQLiteCommand(createTableSQL, sqlConnection);
@@ -93,18 +93,22 @@ namespace SearchEngine
 
             return sqlConnection;
         }
+
         public Dictionary<string, string> ParseDocuments(string[] filePaths, SQLiteConnection sqlConnection, Dictionary<string, string> wordDict)
         {
             string[] stopWords = new string[] { ",", ".", ";", ":", "'", "\\", "/", "|", "_" };
             string sql = string.Empty;
             SQLiteCommand command;
+
             foreach (string filePath in filePaths)
             {
                 
                 long documentId = 0;
                 HashSet<string> isDocumentIdInsertedForWord = new HashSet<string>();
 
-                sql = "insert into documents (documentName) values ('" + filePath + "')";
+                string[] stringArray = File.ReadAllText(filePath).Split(' ');
+
+                sql = "insert into documents (documentName, totalWords) values ('" + filePath + "'," + stringArray.Length +  ")";
                 command = new SQLiteCommand(sql, sqlConnection);
                 command.ExecuteNonQuery();
 
@@ -116,7 +120,6 @@ namespace SearchEngine
                     documentId = Convert.ToInt64(reader["documentId"]);
                 }
 
-                string[] stringArray = File.ReadAllText(filePath).Split(' ');
                 for (int i = 0; i < stringArray.Length; i++)
                 {
                     string resultString = string.Empty;

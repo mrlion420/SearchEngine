@@ -58,6 +58,7 @@ namespace Crawler
 
         protected override void OnStop()
         {
+
         }
 
         protected SQLiteConnection InitializeDatabase(string databaseName)
