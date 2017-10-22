@@ -7,6 +7,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -21,46 +22,82 @@ namespace SearchEngine
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            string url = Directory.GetCurrentDirectory();
+            Thread textCrawlerThread = new Thread(TextFileCrawler);
+            textCrawlerThread.Start();
+
+            while (textCrawlerThread.IsAlive)
+            {
+                Thread.Sleep(2000);
+            }
+
+        }
+
+        private void TextFileCrawler()
+        {
+            Logger log = new Logger(Directory.GetCurrentDirectory() + @"\log.txt");
+            //string url = Directory.GetCurrentDirectory();
+            string[] topDirectories = Directory.GetDirectories(@"C:\");
             string sql = string.Empty;
-            string[] filePaths = Directory.GetFiles(url, "*.txt");
-            Dictionary<string, string> wordDict = new Dictionary<string, string>();
-            Dictionary<string, bool> isDocumentIdInsertedDict = new Dictionary<string, bool>();
+            string[] restrictedDirectories = new string[] { "C:\\Windows", "C:\\$Recycle.Bin" ,"C:\\Recovery", "C:\\inetpub" , "C:\\Program Files", "C:\\Program Files (x86)", "C:\\ProgramData" , "C:\\System Volume Information" };
 
-            SQLiteCommand command;
-            SQLiteConnection sqlConnection;
-
-            string dbName = Directory.GetCurrentDirectory() + @"\searchEngine.db";
-            // Check if database exists or not
-            if (!File.Exists(dbName))
+            foreach (string restrictedDirectory in restrictedDirectories)
             {
-                sqlConnection = InitializeDatabase(dbName);
-            }
-            else
-            {
-                // Connect to Database if database exists
-                sqlConnection = new SQLiteConnection("DataSource=" + dbName);
-                sqlConnection.Open();
+                topDirectories = topDirectories.Where((x) => !x.Equals(restrictedDirectory)).ToArray();
             }
 
-            wordDict = ParseDocuments(filePaths, sqlConnection, wordDict);
-
-            using (SQLiteTransaction transaction = sqlConnection.BeginTransaction())
+            foreach (string directory in topDirectories)
             {
-                foreach (KeyValuePair<string, string> keyValuePair in wordDict)
+                try
                 {
-                    string key = keyValuePair.Key;
-                    string value = keyValuePair.Value;
+                    string[] filePaths = Directory.GetFiles(directory, "*.txt", SearchOption.AllDirectories);
+                    // Check if any text files exist or not
+                    if (filePaths.Length > 0)
+                    {
+                        Dictionary<string, string> wordDict = new Dictionary<string, string>();
+                        Dictionary<string, bool> isDocumentIdInsertedDict = new Dictionary<string, bool>();
 
-                    sql = "insert into reverseIndex (term, position) values ('" + key + "','" + value + "')";
-                    command = new SQLiteCommand(sql, sqlConnection);
-                    command.ExecuteNonQuery();
+                        SQLiteCommand command;
+                        SQLiteConnection sqlConnection;
+
+                        string dbName = Directory.GetCurrentDirectory() + @"\searchEngine.db";
+                        // Check if database exists or not
+                        if (!File.Exists(dbName))
+                        {
+                            sqlConnection = InitializeDatabase(dbName);
+                        }
+                        else
+                        {
+                            // Connect to Database if database exists
+                            sqlConnection = new SQLiteConnection("DataSource=" + dbName);
+                            sqlConnection.Open();
+                        }
+
+                        wordDict = ParseDocuments(filePaths, sqlConnection, wordDict);
+
+                        using (SQLiteTransaction transaction = sqlConnection.BeginTransaction())
+                        {
+                            foreach (KeyValuePair<string, string> keyValuePair in wordDict)
+                            {
+                                string key = keyValuePair.Key;
+                                string value = keyValuePair.Value;
+
+                                sql = "insert into reverseIndex (term, position) values ('" + key + "','" + value + "')";
+                                command = new SQLiteCommand(sql, sqlConnection);
+                                command.ExecuteNonQuery();
+                            }
+
+                            transaction.Commit();
+                        }
+                        sqlConnection.Close();
+                    }
+
+
                 }
-
-                transaction.Commit();
+                catch (UnauthorizedAccessException ex)
+                {
+                    log.write(ex.ToString());
+                }
             }
-
-            sqlConnection.Close();
 
         }
         protected SQLiteConnection InitializeDatabase(string databaseName)
@@ -96,7 +133,7 @@ namespace SearchEngine
 
         public Dictionary<string, string> ParseDocuments(string[] filePaths, SQLiteConnection sqlConnection, Dictionary<string, string> wordDict)
         {
-            string[] stopWords = new string[] { ",", ".", ";", ":", "'", "\\", "/", "|", "_" };
+            string[] stopWords = new string[] { ",", ".", ";", ":", "'", "\"", "\\", "/", "|", "_" , "-" , "(" , ")" };
             string sql = string.Empty;
             SQLiteCommand command;
 
