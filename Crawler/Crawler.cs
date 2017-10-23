@@ -44,26 +44,8 @@ namespace Crawler
                     sqlConnection.Open();
                 }
 
-                foreach (string filePath in filePaths)
-                {
-                    sql = "insert into documents (documentName) values (" + filePath + ")";
-                    command = new SQLiteCommand(sql, sqlConnection);
-                    command.ExecuteNonQuery();
-
-                    string[] stringArray = File.ReadAllText(filePath).Split(' ');
-                    for (int i = 0; i < stringArray.Length; i++)
-                    {
-                        string word = stringArray[i];
-                        if (wordDict.ContainsKey(word))
-                        {
-                            wordDict[word] = "," + i;
-                        }
-                        else
-                        {
-                            wordDict.Add(word, i.ToString());
-                        }
-                    }
-                }
+                FileHelper fileHelper = new FileHelper();
+                wordDict = fileHelper.ParseDocuments(filePaths, sqlConnection, wordDict);
 
                 sqlConnection.Close();
 
@@ -76,6 +58,7 @@ namespace Crawler
 
         protected override void OnStop()
         {
+
         }
 
         protected SQLiteConnection InitializeDatabase(string databaseName)
