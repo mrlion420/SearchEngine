@@ -10,53 +10,95 @@ namespace Crawler
 {
     public class FileHelper
     {
-        public Dictionary<string,string> ParseDocuments(string[] filePaths, SQLiteConnection sqlConnection, Dictionary<string, string> wordDict)
+        public Dictionary<string, string> ParseDocuments(string[] filePaths, SQLiteConnection sqlConnection, Dictionary<string, string> wordDict)
         {
+            string[] stopWords = new string[] { ",", ".", ";", ":", "'", "\"", "\\", "/", "|", "_", "-", "(", ")" };
             string sql = string.Empty;
             SQLiteCommand command;
+
             foreach (string filePath in filePaths)
             {
-                bool isDocumentIdInserted = false;
-                long documentId = 0;
-
-                sql = "insert into documents (documentName) values ('" + filePath + "')";
-                command = new SQLiteCommand(sql, sqlConnection);
-                command.ExecuteNonQuery();
-
-                sql = "select documentId from documents where documentName = '" + filePath + "'";
-                command = new SQLiteCommand(sql, sqlConnection);
-                SQLiteDataReader reader = command.ExecuteReader();
-                while (reader.Read())
+                if (isIndexedInDatabase(filePath, sqlConnection))
                 {
-                    documentId = Convert.ToInt64(reader["documentId"]);
-                }
+                    long documentId = 0;
+                    HashSet<string> isDocumentIdInsertedForWord = new HashSet<string>();
 
-                string[] stringArray = File.ReadAllText(filePath).Split(' ');
-                for (int i = 0; i < stringArray.Length; i++)
-                {
-                    // NEED TO DECIDE WHETHER WE WILL INCLUDE STOP WORDS SUCH AS PREPOSITION OR NOT
-                    string word = stringArray[i];
-                    if (wordDict.ContainsKey(word))
+                    string[] stringArray = File.ReadAllText(filePath).Split(' ');
+
+                    sql = "insert into documents (documentName, totalWords) values ('" + filePath + "'," + stringArray.Length + ")";
+                    command = new SQLiteCommand(sql, sqlConnection);
+                    command.ExecuteNonQuery();
+
+                    sql = "select documentId from documents where documentName = '" + filePath + "'";
+                    command = new SQLiteCommand(sql, sqlConnection);
+                    SQLiteDataReader reader = command.ExecuteReader();
+                    while (reader.Read())
                     {
-                        if (isDocumentIdInserted)
+                        documentId = Convert.ToInt64(reader["documentId"]);
+                    }
+
+                    for (int i = 0; i < stringArray.Length; i++)
+                    {
+                        string resultString = string.Empty;
+
+                        string word = stringArray[i].ToLower();
+                        word = RemoveStopWords(word, stopWords);
+
+                        if (wordDict.ContainsKey(word))
                         {
-                            wordDict[word] = ";" + documentId + ":" + i;
-                            isDocumentIdInserted = true;
+                            if (isDocumentIdInsertedForWord.Contains(word))
+                            {
+                                resultString = "," + i;
+                            }
+                            else
+                            {
+                                resultString = ";" + documentId + ":" + i;
+                                isDocumentIdInsertedForWord.Add(word);
+                            }
+                            // += the resulting string
+                            wordDict[word] += resultString;
                         }
                         else
                         {
-                            wordDict[word] = "," + i;
+                            resultString = documentId + ":" + i;
+                            wordDict.Add(word, resultString);
+                            isDocumentIdInsertedForWord.Add(word);
+
                         }
 
                     }
-                    else
-                    {
-                        wordDict.Add(word, documentId + ":" + i.ToString());
-                    }
                 }
+
             }
 
             return wordDict;
+        }
+
+        public bool isIndexedInDatabase(string filePath, SQLiteConnection sqlConnection)
+        {
+            bool isIndexedInDatabase = false;
+            string sql = "select documentId from documents where documentName = '" + filePath + "'";
+            SQLiteCommand command = new SQLiteCommand(sql, sqlConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                isIndexedInDatabase = true;
+            }
+
+            return isIndexedInDatabase;
+        }
+
+        public string RemoveStopWords(string word, string[] stopWords)
+        {
+            foreach (string stopWord in stopWords)
+            {
+                if (word.Contains(stopWord))
+                {
+                    word = word.Replace(stopWord, "");
+                }
+            }
+
+            return word;
         }
     }
 }
