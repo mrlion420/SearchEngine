@@ -24,6 +24,7 @@ namespace Crawler
         protected override void OnStart(string[] args)
         {
             Logger log = new Logger(Path.GetDirectoryName(Application.ExecutablePath) + @"\log.txt");
+
             try
             {
                 Thread textCrawlerThread = new Thread(TextFileCrawler);
