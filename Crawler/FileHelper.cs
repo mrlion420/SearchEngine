@@ -10,7 +10,7 @@ namespace Crawler
 {
     public class FileHelper
     {
-        public Dictionary<string, string> ParseDocuments(string[] filePaths, SQLiteConnection sqlConnection, Dictionary<string, string> wordDict)
+        public Dictionary<string, string> ParseDocuments(List<string> filePaths, SQLiteConnection sqlConnection, Dictionary<string, string> wordDict)
         {
             string[] stopWords = new string[] { ",", ".", ";", ":", "'", "\"", "\\", "/", "|", "_", "-", "(", ")" };
             string sql = string.Empty;

@@ -1,0 +1,13 @@
+﻿Installing assembly 'C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\crawler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\crawler.InstallLog
+   assemblypath = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\crawler.exe
+Installing service Crawler...
+Service Crawler has been successfully installed.
+Creating EventLog source Crawler in log Application...
+Committing assembly 'C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\crawler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\crawler.InstallLog
+   assemblypath = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\crawler.exe

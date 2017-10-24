@@ -10,6 +10,7 @@ using System.ServiceProcess;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Crawler
 {
@@ -22,13 +23,22 @@ namespace Crawler
 
         protected override void OnStart(string[] args)
         {
-            Thread textCrawlerThread = new Thread(TextFileCrawler);
-            textCrawlerThread.Start();
-
-            while (textCrawlerThread.IsAlive)
+            Logger log = new Logger(Path.GetDirectoryName(Application.ExecutablePath) + @"\log.txt");
+            try
             {
-                Thread.Sleep(2000);
+                Thread textCrawlerThread = new Thread(TextFileCrawler);
+                textCrawlerThread.Start();
+
+                while (textCrawlerThread.IsAlive)
+                {
+                    Thread.Sleep(2000);
+                }
+
+            }catch(Exception ex)
+            {
+                log.write(ex.ToString());
             }
+            
         }
 
         protected override void OnStop()
@@ -38,9 +48,6 @@ namespace Crawler
 
         private void TextFileCrawler()
         {
-            Logger log = new Logger(Directory.GetCurrentDirectory() + @"\log.txt");
-            //string url = Directory.GetCurrentDirectory();
-
             DriveInfo[] logicalDriveInfoArray = DriveInfo.GetDrives();
             foreach (DriveInfo logicalDrive in logicalDriveInfoArray)
             {
@@ -51,76 +58,124 @@ namespace Crawler
                     string[] topDirectories = Directory.GetDirectories(logicalDrive.Name);
                     string sql = string.Empty;
                     string[] restrictedDirectories = new string[] { "C:\\Windows", "C:\\$Recycle.Bin", "C:\\Recovery", "C:\\inetpub", "C:\\Program Files", "C:\\Program Files (x86)", "C:\\ProgramData", "C:\\System Volume Information" };
+                    string[] tempDirectories = new string[] { "AppData", "Local", "LocalLow", "Roaming", "tools_r25.2.3-windows" };
 
                     foreach (string restrictedDirectory in restrictedDirectories)
                     {
                         topDirectories = topDirectories.Where((x) => !x.Equals(restrictedDirectory)).ToArray();
                     }
 
+                    foreach (string tempDirectory in tempDirectories)
+                    {
+                        topDirectories = topDirectories.Where((x) => !x.Contains(tempDirectory)).ToArray();
+                    }
+
                     foreach (string directory in topDirectories)
                     {
                         // Catch the access denied errors.
                         // Crawler will move on to another directory if access denied error occurs.
-                        try
+
+                        List<string> filePaths = GetFiles(directory, "*.txt");
+                        foreach (string tempdirectory in tempDirectories)
                         {
-                            string[] filePaths = Directory.GetFiles(directory, "*.txt", SearchOption.AllDirectories);
-                            // Check if any text files exist or not
-                            if (filePaths.Length > 0)
+                            filePaths = filePaths.Where((x) => !x.Contains(tempdirectory)).ToList();
+                        }
+                        // Check if any text files exist or not
+                        if (filePaths.Count > 0)
+                        {
+                            Dictionary<string, string> wordDict = new Dictionary<string, string>();
+                            Dictionary<string, bool> isDocumentIdInsertedDict = new Dictionary<string, bool>();
+                            SQLiteConnection sqlConnection;
+
+                            string dbName = Path.GetDirectoryName(Application.ExecutablePath) + @"\searchEngine.db";
+                            // Check if database exists or not
+                            if (!File.Exists(dbName))
                             {
-                                Dictionary<string, string> wordDict = new Dictionary<string, string>();
-                                Dictionary<string, bool> isDocumentIdInsertedDict = new Dictionary<string, bool>();
-
-                                SQLiteCommand command;
-                                SQLiteConnection sqlConnection;
-
-                                string dbName = Directory.GetCurrentDirectory() + @"\searchEngine.db";
-                                // Check if database exists or not
-                                if (!File.Exists(dbName))
-                                {
-                                    sqlConnection = InitializeDatabase(dbName);
-                                }
-                                else
-                                {
-                                    // Connect to Database if database exists
-                                    sqlConnection = new SQLiteConnection("DataSource=" + dbName);
-                                    sqlConnection.Open();
-                                }
-
-                                FileHelper file = new FileHelper();
-                                wordDict = file.ParseDocuments(filePaths, sqlConnection, wordDict);
-
-                                // Check if the dictionary is empty or not 
-                                if (wordDict.Count > 0)
-                                {
-                                    // Start sql transaction
-                                    using (SQLiteTransaction transaction = sqlConnection.BeginTransaction())
-                                    {
-                                        foreach (KeyValuePair<string, string> keyValuePair in wordDict)
-                                        {
-                                            string key = keyValuePair.Key;
-                                            string value = keyValuePair.Value;
-
-                                            sql = "insert into reverseIndex (term, position) values ('" + key + "','" + value + "')";
-                                            command = new SQLiteCommand(sql, sqlConnection);
-                                            command.ExecuteNonQuery();
-                                        }
-                                        transaction.Commit();
-                                    }
-                                    // Finally Close the sql connection
-                                    sqlConnection.Close();
-                                }
-
+                                sqlConnection = InitializeDatabase(dbName);
+                            }
+                            else
+                            {
+                                // Connect to Database if database exists
+                                sqlConnection = new SQLiteConnection("DataSource=" + dbName);
+                                sqlConnection.Open();
                             }
 
-                        }
-                        catch (UnauthorizedAccessException ex)
-                        {
-                            log.write(ex.ToString());
+                            FileHelper file = new FileHelper();
+                            wordDict = file.ParseDocuments(filePaths, sqlConnection, wordDict);
+
+                            // Check if the dictionary is empty or not 
+                            if (wordDict.Count > 0)
+                            {
+                                // Start sql transaction
+                                InsertOrUpdateReverseIndex(sqlConnection, wordDict);
+                                // Finally Close the sql connection
+                                sqlConnection.Close();
+                            }
+
                         }
                     }
                 }
             }
 
+        }
+
+        public void InsertOrUpdateReverseIndex(SQLiteConnection sqlConnection, Dictionary<string,string> wordDict)
+        {
+            using (SQLiteTransaction transaction = sqlConnection.BeginTransaction())
+            {
+                foreach (KeyValuePair<string, string> keyValuePair in wordDict)
+                {
+                    string key = keyValuePair.Key;
+                    string value = keyValuePair.Value;
+                    string position = string.Empty;
+                    string result = string.Empty;
+
+                    string sql = "select * from reverseIndex where term ='" + key + "'";
+                    SQLiteCommand command = new SQLiteCommand(sql, sqlConnection);
+                    SQLiteDataReader reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        position = reader.GetString(1);
+                    }
+
+                    if (!string.IsNullOrEmpty(position))
+                    {
+                        result = position + ";" + value;
+                        sql = "update reverseIndex set position ='" + result + "' where term ='" + key + "'";
+                    }
+                    else
+                    {
+                        result = value;
+                        sql = "insert into reverseIndex (term, position) values ('" + key + "','" + result + "')";
+                    }
+
+                    command = new SQLiteCommand(sql, sqlConnection);
+                    command.ExecuteNonQuery();
+                }
+                transaction.Commit();
+            }
+        }
+
+        public bool ContainsUnicodeCharacter(string input)
+        {
+            const int MaxAnsiCode = 255;
+
+            return input.Any(c => c > MaxAnsiCode);
+        }
+
+        private List<string> GetFiles(string path, string pattern)
+        {
+            var files = new List<string>();
+
+            try
+            {
+                files.AddRange(Directory.GetFiles(path, pattern, SearchOption.TopDirectoryOnly));
+                foreach (var directory in Directory.GetDirectories(path))
+                    files.AddRange(GetFiles(directory, pattern));
+            }
+            catch (UnauthorizedAccessException) { }
+
+            return files;
         }
 
         protected SQLiteConnection InitializeDatabase(string databaseName)

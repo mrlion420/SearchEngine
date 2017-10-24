@@ -23,6 +23,8 @@ namespace SearchEngine
         private void Form1_Load(object sender, EventArgs e)
         {
 
+           
+
         }
 
         #region Test Code
@@ -33,10 +35,10 @@ namespace SearchEngine
         //    //string url = Directory.GetCurrentDirectory();
 
         //    DriveInfo[] logicalDriveInfoArray = DriveInfo.GetDrives();
-        //    foreach(DriveInfo logicalDrive in logicalDriveInfoArray)
+        //    foreach (DriveInfo logicalDrive in logicalDriveInfoArray)
         //    {
         //        DriveType driveType = logicalDrive.DriveType;
-        //        if(driveType == DriveType.Fixed)
+        //        if (driveType == DriveType.Fixed)
         //        {
         //            string driveName = logicalDrive.Name;
         //            string[] topDirectories = Directory.GetDirectories(logicalDrive.Name);
@@ -77,7 +79,7 @@ namespace SearchEngine
         //                            sqlConnection.Open();
         //                        }
 
-        //                        wordDict = ParseDocuments(filePaths, sqlConnection, wordDict);
+        //                        //wordDict = ParseDocuments(filePaths, sqlConnection, wordDict);
 
         //                        // Check if the dictionary is empty or not 
         //                        if (wordDict.Count > 0)
@@ -110,7 +112,7 @@ namespace SearchEngine
         //            }
         //        }
         //    }
-
+        //    log.write("Program done");
 
         //}
 
@@ -159,7 +161,7 @@ namespace SearchEngine
         //    return isIndexedInDatabase;
         //}
 
-        //public Dictionary<string, string> ParseDocuments(string[] filePaths, SQLiteConnection sqlConnection, Dictionary<string, string> wordDict)
+        //public Dictionary<string, string> ParseDocuments(List<string> filePaths, SQLiteConnection sqlConnection, Dictionary<string, string> wordDict)
         //{
         //    string[] stopWords = new string[] { ",", ".", ";", ":", "'", "\"", "\\", "/", "|", "_", "-", "(", ")" };
         //    string sql = string.Empty;
@@ -167,7 +169,7 @@ namespace SearchEngine
 
         //    foreach (string filePath in filePaths)
         //    {
-        //        if (isIndexedInDatabase(filePath, sqlConnection))
+        //        if (!isIndexedInDatabase(filePath, sqlConnection))
         //        {
         //            long documentId = 0;
         //            HashSet<string> isDocumentIdInsertedForWord = new HashSet<string>();
@@ -192,29 +194,30 @@ namespace SearchEngine
 
         //                string word = stringArray[i].ToLower();
         //                word = RemoveStopWords(word, stopWords);
-
-        //                if (wordDict.ContainsKey(word))
+        //                if (!ContainsUnicodeCharacter(word))
         //                {
-        //                    if (isDocumentIdInsertedForWord.Contains(word))
+        //                    if (wordDict.ContainsKey(word))
         //                    {
-        //                        resultString = "," + i;
+        //                        if (isDocumentIdInsertedForWord.Contains(word))
+        //                        {
+        //                            resultString = "," + i;
+        //                        }
+        //                        else
+        //                        {
+        //                            resultString = ";" + documentId + ":" + i;
+        //                            isDocumentIdInsertedForWord.Add(word);
+        //                        }
+        //                        // += the resulting string
+        //                        wordDict[word] += resultString;
         //                    }
         //                    else
         //                    {
-        //                        resultString = ";" + documentId + ":" + i;
+        //                        resultString = documentId + ":" + i;
+        //                        wordDict.Add(word, resultString);
         //                        isDocumentIdInsertedForWord.Add(word);
         //                    }
-        //                    // += the resulting string
-        //                    wordDict[word] += resultString;
         //                }
-        //                else
-        //                {
-        //                    resultString = documentId + ":" + i;
-        //                    wordDict.Add(word, resultString);
-        //                    isDocumentIdInsertedForWord.Add(word);
-
-        //                }
-
+                       
         //            }
         //        }
 
@@ -225,7 +228,7 @@ namespace SearchEngine
 
         //public string RemoveStopWords(string word, string[] stopWords)
         //{
-        //    foreach(string stopWord in stopWords)
+        //    foreach (string stopWord in stopWords)
         //    {
         //        if (word.Contains(stopWord))
         //        {
@@ -234,6 +237,52 @@ namespace SearchEngine
         //    }
 
         //    return word;
+        //}
+
+        //public bool ContainsUnicodeCharacter(string input)
+        //{
+        //    const int MaxAnsiCode = 255;
+
+        //    return input.Any(c => c > MaxAnsiCode);
+        //}
+
+        //public string[] GetFilesFromTopDirectory(string directory, string fileFormat)
+        //{
+        //    string[] result;
+        //    string[] subDirectoryResult = new string[] { };
+        //    string[] files = Directory.GetFiles(directory, fileFormat, SearchOption.TopDirectoryOnly);
+        //    string[] subDirectoryArray = Directory.GetDirectories(directory);
+        //    foreach(string subDirectory in subDirectoryArray)
+        //    {
+        //        try
+        //        {
+        //            subDirectoryResult = GetFilesFromTopDirectory(subDirectory, fileFormat);
+        //        }
+        //        catch(Exception ex)
+        //        {
+                    
+        //        }
+                
+        //    }
+
+        //    result = files.Concat(subDirectoryResult).ToArray();
+
+        //    return result;
+        //}
+
+        //private List<string> GetFiles(string path, string pattern)
+        //{
+        //    var files = new List<string>();
+
+        //    try
+        //    {
+        //        files.AddRange(Directory.GetFiles(path, pattern, SearchOption.TopDirectoryOnly));
+        //        foreach (var directory in Directory.GetDirectories(path))
+        //            files.AddRange(GetFiles(directory, pattern));
+        //    }
+        //    catch (UnauthorizedAccessException) { }
+
+        //    return files;
         //}
         #endregion
     }

@@ -1,13 +1,30 @@
-System.UnauthorizedAccessException: Access to the path 'C:\Documents and Settings' is denied.
-   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
-   at System.IO.FileSystemEnumerableIterator`1.CommonInit()
-   at System.IO.FileSystemEnumerableIterator`1..ctor(String path, String originalUserPath, String searchPattern, SearchOption searchOption, SearchResultHandler`1 resultHandler, Boolean checkHost)
-   at System.IO.Directory.GetFiles(String path, String searchPattern, SearchOption searchOption)
-   at SearchEngine.Form1.TextFileCrawler() in E:\Software\SearchEngine\SearchEngine\Form1.cs:line 52
-System.UnauthorizedAccessException: Access to the path 'C:\Users\.NET v4.5\AppData\Local\Application Data' is denied.
-   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
-   at System.IO.FileSystemEnumerableIterator`1.AddSearchableDirsToStack(SearchData localSearchData)
-   at System.IO.FileSystemEnumerableIterator`1.MoveNext()
-   at System.Collections.Generic.List`1..ctor(IEnumerable`1 collection)
-   at System.IO.Directory.GetFiles(String path, String searchPattern, SearchOption searchOption)
-   at SearchEngine.Form1.TextFileCrawler() in E:\Software\SearchEngine\SearchEngine\Form1.cs:line 52
+System.Data.SQLite.SQLiteException (0x80004005): SQL logic error or missing database
+unrecognized token: "'"
+   at System.Data.SQLite.SQLite3.Prepare(SQLiteConnection cnn, String strSql, SQLiteStatement previous, UInt32 timeoutMS, String& strRemain)
+   at System.Data.SQLite.SQLiteCommand.BuildNextCommand()
+   at System.Data.SQLite.SQLiteCommand.GetStatement(Int32 index)
+   at System.Data.SQLite.SQLiteDataReader.NextResult()
+   at System.Data.SQLite.SQLiteDataReader..ctor(SQLiteCommand cmd, CommandBehavior behave)
+   at System.Data.SQLite.SQLiteCommand.ExecuteReader(CommandBehavior behavior)
+   at System.Data.SQLite.SQLiteCommand.ExecuteReader()
+   at SearchEngine.Form1.Form1_Load(Object sender, EventArgs e) in C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\SearchEngine\Form1.cs:line 98
+System.Data.SQLite.SQLiteException (0x80004005): SQL logic error or missing database
+unrecognized token: "'"
+   at System.Data.SQLite.SQLite3.Prepare(SQLiteConnection cnn, String strSql, SQLiteStatement previous, UInt32 timeoutMS, String& strRemain)
+   at System.Data.SQLite.SQLiteCommand.BuildNextCommand()
+   at System.Data.SQLite.SQLiteCommand.GetStatement(Int32 index)
+   at System.Data.SQLite.SQLiteDataReader.NextResult()
+   at System.Data.SQLite.SQLiteDataReader..ctor(SQLiteCommand cmd, CommandBehavior behave)
+   at System.Data.SQLite.SQLiteCommand.ExecuteReader(CommandBehavior behavior)
+   at System.Data.SQLite.SQLiteCommand.ExecuteReader()
+   at SearchEngine.Form1.Form1_Load(Object sender, EventArgs e) in C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\SearchEngine\Form1.cs:line 102
+System.Data.SQLite.SQLiteException (0x80004005): SQL logic error or missing database
+not an error
+   at System.Data.SQLite.SQLite3.Prepare(SQLiteConnection cnn, String strSql, SQLiteStatement previous, UInt32 timeoutMS, String& strRemain)
+   at System.Data.SQLite.SQLiteCommand.BuildNextCommand()
+   at System.Data.SQLite.SQLiteCommand.GetStatement(Int32 index)
+   at System.Data.SQLite.SQLiteDataReader.NextResult()
+   at System.Data.SQLite.SQLiteDataReader..ctor(SQLiteCommand cmd, CommandBehavior behave)
+   at System.Data.SQLite.SQLiteCommand.ExecuteReader(CommandBehavior behavior)
+   at System.Data.SQLite.SQLiteCommand.ExecuteReader()
+   at SearchEngine.Form1.Form1_Load(Object sender, EventArgs e) in C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\SearchEngine\Form1.cs:line 102
