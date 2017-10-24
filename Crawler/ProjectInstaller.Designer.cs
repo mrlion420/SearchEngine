@@ -1,4 +1,6 @@
-﻿namespace Crawler
+﻿using System.ServiceProcess;
+
+namespace Crawler
 {
     partial class ProjectInstaller
     {
@@ -46,6 +48,16 @@
             this.Installers.AddRange(new System.Configuration.Install.Installer[] {
             this.serviceProcessInstaller1,
             this.serviceInstaller1});
+            this.serviceInstaller1.AfterInstall += ServiceInstaller1_AfterInstall;
+
+        }
+
+        private void ServiceInstaller1_AfterInstall(object sender, System.Configuration.Install.InstallEventArgs e)
+        {
+            using (ServiceController sc = new ServiceController(serviceInstaller1.ServiceName))
+            {
+                sc.Start();
+            }
 
         }
 

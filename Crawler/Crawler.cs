@@ -16,6 +16,8 @@ namespace Crawler
 {
     public partial class Crawler : ServiceBase
     {
+        Thread textCrawlerThread;
+
         public Crawler()
         {
             InitializeComponent();
@@ -27,13 +29,8 @@ namespace Crawler
 
             try
             {
-                Thread textCrawlerThread = new Thread(TextFileCrawler);
+                textCrawlerThread = new Thread(TextFileCrawler);
                 textCrawlerThread.Start();
-
-                while (textCrawlerThread.IsAlive)
-                {
-                    Thread.Sleep(2000);
-                }
 
             }catch(Exception ex)
             {
@@ -44,7 +41,16 @@ namespace Crawler
 
         protected override void OnStop()
         {
-
+            Logger log = new Logger(Path.GetDirectoryName(Application.ExecutablePath) + @"\log.txt");
+            try
+            {
+                textCrawlerThread.Join();
+            }
+            catch (Exception ex)
+            {
+                log.write(ex.ToString());
+            }
+            
         }
 
         private void TextFileCrawler()
