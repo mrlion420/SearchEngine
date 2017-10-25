@@ -4,12 +4,15 @@ using System.Data.SQLite;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Crawler
 {
     public class FileHelper
     {
+        
         public Dictionary<string, string> ParseDocuments(List<string> filePaths, SQLiteConnection sqlConnection, Dictionary<string, string> wordDict)
         {
             string[] stopWords = new string[] { ",", ".", ";", ":", "'", "\"", "\\", "/", "|", "_", "-", "(", ")" };
@@ -40,38 +43,44 @@ namespace Crawler
                     for (int i = 0; i < stringArray.Length; i++)
                     {
                         string resultString = string.Empty;
-
                         string word = stringArray[i].ToLower();
                         word = RemoveStopWords(word, stopWords);
+                        word = StripHTML(word);
+                        word = RemoveUnicode(word);
 
-                        if (wordDict.ContainsKey(word))
+                        if (!ContainsUnicodeCharacter(word) && !string.IsNullOrWhiteSpace(word))
                         {
-                            if (isDocumentIdInsertedForWord.Contains(word))
+                            if (wordDict.ContainsKey(word))
                             {
-                                resultString = "," + i;
+                                if (isDocumentIdInsertedForWord.Contains(word))
+                                {
+                                    resultString = "," + i;
+                                }
+                                else
+                                {
+                                    resultString = ";" + documentId + ":" + i;
+                                    isDocumentIdInsertedForWord.Add(word);
+                                }
+                                // += the resulting string
+                                wordDict[word] += resultString;
                             }
                             else
                             {
-                                resultString = ";" + documentId + ":" + i;
+                                resultString = documentId + ":" + i;
+                                wordDict.Add(word, resultString);
                                 isDocumentIdInsertedForWord.Add(word);
                             }
-                            // += the resulting string
-                            wordDict[word] += resultString;
                         }
-                        else
-                        {
-                            resultString = documentId + ":" + i;
-                            wordDict.Add(word, resultString);
-                            isDocumentIdInsertedForWord.Add(word);
-
-                        }
-
                     }
                 }
-
             }
 
             return wordDict;
+        }
+
+        public string StripHTML(string input)
+        {
+            return Regex.Replace(input, "<.*?>", String.Empty);
         }
 
         public bool isIndexedInDatabase(string filePath, SQLiteConnection sqlConnection)
@@ -88,13 +97,25 @@ namespace Crawler
             return isIndexedInDatabase;
         }
 
+        private string RemoveUnicode(string input)
+        {
+            return System.Text.Encoding.ASCII.GetString(System.Text.Encoding.ASCII.GetBytes(input));
+        }
+
+        public bool ContainsUnicodeCharacter(string input)
+        {
+            const int MaxAnsiCode = 255;
+
+            return input.Any(c => c > MaxAnsiCode);
+        }
+
         public string RemoveStopWords(string word, string[] stopWords)
         {
             foreach (string stopWord in stopWords)
             {
                 if (word.Contains(stopWord))
                 {
-                    word = word.Replace(stopWord, "");
+                    word = word.Replace(stopWord, string.Empty);
                 }
             }
 

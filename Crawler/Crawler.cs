@@ -16,7 +16,6 @@ namespace Crawler
 {
     public partial class Crawler : ServiceBase
     {
-        Thread textCrawlerThread;
 
         public Crawler()
         {
@@ -26,11 +25,19 @@ namespace Crawler
         protected override void OnStart(string[] args)
         {
             Logger log = new Logger(Path.GetDirectoryName(Application.ExecutablePath) + @"\log.txt");
+            List<string> fileTypes = new List<string>();
+            fileTypes.Add("*.txt");
+            //fileTypes.Add("*.html");
 
             try
             {
-                textCrawlerThread = new Thread(TextFileCrawler);
-                textCrawlerThread.Start();
+                
+                foreach(string fileType in fileTypes)
+                {
+                    Thread thread = new Thread(() => FileCrawler(fileType));
+                    thread.Start();
+                }
+                
 
             }catch(Exception ex)
             {
@@ -44,7 +51,7 @@ namespace Crawler
             Logger log = new Logger(Path.GetDirectoryName(Application.ExecutablePath) + @"\log.txt");
             try
             {
-                textCrawlerThread.Join();
+                
             }
             catch (Exception ex)
             {
@@ -53,7 +60,7 @@ namespace Crawler
             
         }
 
-        private void TextFileCrawler()
+        private void FileCrawler(string pattern)
         {
             DriveInfo[] logicalDriveInfoArray = DriveInfo.GetDrives();
             foreach (DriveInfo logicalDrive in logicalDriveInfoArray)
@@ -81,8 +88,7 @@ namespace Crawler
                     {
                         // Catch the access denied errors.
                         // Crawler will move on to another directory if access denied error occurs.
-
-                        List<string> filePaths = GetFiles(directory, "*.txt");
+                        List<string> filePaths = GetFiles(directory, pattern);
                         foreach (string tempdirectory in tempDirectories)
                         {
                             filePaths = filePaths.Where((x) => !x.Contains(tempdirectory)).ToList();
@@ -126,48 +132,73 @@ namespace Crawler
 
         }
 
-        public void InsertOrUpdateReverseIndex(SQLiteConnection sqlConnection, Dictionary<string,string> wordDict)
+        public void InsertOrUpdateReverseIndex(SQLiteConnection sqlConnection, Dictionary<string, string> wordDict)
         {
+            Logger log = new Logger(Path.GetDirectoryName(Application.ExecutablePath) + @"\log.txt");
+
             using (SQLiteTransaction transaction = sqlConnection.BeginTransaction())
             {
+                //int count = 1;
                 foreach (KeyValuePair<string, string> keyValuePair in wordDict)
                 {
                     string key = keyValuePair.Key;
                     string value = keyValuePair.Value;
                     string position = string.Empty;
                     string result = string.Empty;
-
-                    string sql = "select * from reverseIndex where term ='" + key + "'";
-                    SQLiteCommand command = new SQLiteCommand(sql, sqlConnection);
-                    SQLiteDataReader reader = command.ExecuteReader();
-                    while (reader.Read())
+                    key = RemoveWhitespace(key);
+                    try
                     {
-                        position = reader.GetString(1);
-                    }
+                        string sql = "select * from reverseIndex where term ='" + key + "'";
 
-                    if (!string.IsNullOrEmpty(position))
-                    {
-                        result = position + ";" + value;
-                        sql = "update reverseIndex set position ='" + result + "' where term ='" + key + "'";
-                    }
-                    else
-                    {
-                        result = value;
-                        sql = "insert into reverseIndex (term, position) values ('" + key + "','" + result + "')";
-                    }
+                        //log.write(count + " --> " + sql);
 
-                    command = new SQLiteCommand(sql, sqlConnection);
-                    command.ExecuteNonQuery();
+                        //count++;
+                        SQLiteCommand command = new SQLiteCommand(sql, sqlConnection);
+                        SQLiteDataReader reader = command.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            position = reader.GetString(1);
+                        }
+
+                        if (!string.IsNullOrEmpty(position))
+                        {
+                            result = position + ";" + value;
+                            sql = "update reverseIndex set position ='" + result + "' where term ='" + key + "'";
+                        }
+                        else
+                        {
+                            result = value;
+                            sql = "insert into reverseIndex (term, position) values ('" + key + "','" + result + "')";
+                        }
+
+                        command = new SQLiteCommand(sql, sqlConnection);
+                        command.ExecuteNonQuery();
+                    }
+                    catch (Exception ex)
+                    {
+                        log.write(ex.ToString());
+                    }
                 }
                 transaction.Commit();
             }
+            
         }
 
-        public bool ContainsUnicodeCharacter(string input)
+        private string RemoveWhitespace(string str)
+        {
+            return string.Join("", str.Split(default(string[]), StringSplitOptions.RemoveEmptyEntries));
+        }
+
+        private bool ContainsUnicodeCharacter(string input)
         {
             const int MaxAnsiCode = 255;
 
             return input.Any(c => c > MaxAnsiCode);
+        }
+
+        private string RemoveUnicode(string input)
+        {
+            return System.Text.Encoding.ASCII.GetString(System.Text.Encoding.ASCII.GetBytes(input));
         }
 
         private List<string> GetFiles(string path, string pattern)

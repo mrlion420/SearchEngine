@@ -75,7 +75,9 @@
     <None Include="Install\Install.bat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Install\Uninstall.bat" />
+    <None Include="Install\Uninstall.bat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="External Ref\sqlite3.dll" />
