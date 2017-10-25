@@ -62,73 +62,90 @@ namespace Crawler
 
         private void FileCrawler(string pattern)
         {
-            DriveInfo[] logicalDriveInfoArray = DriveInfo.GetDrives();
-            foreach (DriveInfo logicalDrive in logicalDriveInfoArray)
+            Logger log = new Logger(Path.GetDirectoryName(Application.ExecutablePath) + @"\log.txt");
+            try
             {
-                DriveType driveType = logicalDrive.DriveType;
-                if (driveType == DriveType.Fixed)
+                DriveInfo[] logicalDriveInfoArray = DriveInfo.GetDrives();
+                foreach (DriveInfo logicalDrive in logicalDriveInfoArray)
                 {
-                    string driveName = logicalDrive.Name;
-                    string[] topDirectories = Directory.GetDirectories(logicalDrive.Name);
-                    string sql = string.Empty;
-                    string[] restrictedDirectories = new string[] { "C:\\Windows", "C:\\$Recycle.Bin", "C:\\Recovery", "C:\\inetpub", "C:\\Program Files", "C:\\Program Files (x86)", "C:\\ProgramData", "C:\\System Volume Information" };
-                    string[] tempDirectories = new string[] { "AppData", "Local", "LocalLow", "Roaming", "tools_r25.2.3-windows" };
-
-                    foreach (string restrictedDirectory in restrictedDirectories)
+                    DriveType driveType = logicalDrive.DriveType;
+                    if (driveType == DriveType.Fixed)
                     {
-                        topDirectories = topDirectories.Where((x) => !x.Equals(restrictedDirectory)).ToArray();
-                    }
+                        string driveName = logicalDrive.Name;
+                        string[] topDirectories = Directory.GetDirectories(logicalDrive.Name);
+                        string sql = string.Empty;
+                        string[] restrictedDirectories = new string[] { "C:\\Windows", "C:\\$Recycle.Bin", "C:\\Recovery", "C:\\inetpub", "C:\\Program Files", "C:\\Program Files (x86)", "C:\\ProgramData", "C:\\System Volume Information" };
+                        string[] tempDirectories = new string[] { "AppData", "Local", "LocalLow", "Roaming", "tools_r25.2.3-windows" };
 
-                    foreach (string tempDirectory in tempDirectories)
-                    {
-                        topDirectories = topDirectories.Where((x) => !x.Contains(tempDirectory)).ToArray();
-                    }
-
-                    foreach (string directory in topDirectories)
-                    {
-                        // Catch the access denied errors.
-                        // Crawler will move on to another directory if access denied error occurs.
-                        List<string> filePaths = GetFiles(directory, pattern);
-                        foreach (string tempdirectory in tempDirectories)
+                        foreach (string restrictedDirectory in restrictedDirectories)
                         {
-                            filePaths = filePaths.Where((x) => !x.Contains(tempdirectory)).ToList();
+                            topDirectories = topDirectories.Where((x) => !x.Equals(restrictedDirectory)).ToArray();
                         }
-                        // Check if any text files exist or not
-                        if (filePaths.Count > 0)
+
+                        foreach (string tempDirectory in tempDirectories)
                         {
-                            Dictionary<string, string> wordDict = new Dictionary<string, string>();
-                            Dictionary<string, bool> isDocumentIdInsertedDict = new Dictionary<string, bool>();
-                            SQLiteConnection sqlConnection;
+                            topDirectories = topDirectories.Where((x) => !x.Contains(tempDirectory)).ToArray();
+                        }
 
-                            string dbName = Path.GetDirectoryName(Application.ExecutablePath) + @"\searchEngine.db";
-                            // Check if database exists or not
-                            if (!File.Exists(dbName))
+                        foreach (string directory in topDirectories)
+                        {
+                            // Catch the access denied errors.
+                            // Crawler will move on to another directory if access denied error occurs.
+                            List<string> filePaths = GetFiles(directory, pattern);
+                            foreach (string tempdirectory in tempDirectories)
                             {
-                                sqlConnection = InitializeDatabase(dbName);
+                                filePaths = filePaths.Where((x) => !x.Contains(tempdirectory)).ToList();
                             }
-                            else
+                            // Check if any text files exist or not
+                            if (filePaths.Count > 0)
                             {
-                                // Connect to Database if database exists
-                                sqlConnection = new SQLiteConnection("DataSource=" + dbName);
-                                sqlConnection.Open();
+                                Dictionary<string, string> wordDict = new Dictionary<string, string>();
+                                Dictionary<string, bool> isDocumentIdInsertedDict = new Dictionary<string, bool>();
+                                SQLiteConnection sqlConnection;
+
+                                string dbName = Path.GetDirectoryName(Application.ExecutablePath) + @"\searchEngine.db";
+                                // Check if database exists or not
+                                if (!File.Exists(dbName))
+                                {
+                                    sqlConnection = InitializeDatabase(dbName);
+                                }
+                                else
+                                {
+                                    // Connect to Database if database exists
+                                    sqlConnection = new SQLiteConnection("DataSource=" + dbName);
+                                    sqlConnection.Open();
+
+                                }
+
+                                FileHelper file = new FileHelper();
+                                try
+                                {
+                                    wordDict = file.ParseDocuments(filePaths, sqlConnection, wordDict);
+                                }
+                                catch(Exception ex)
+                                {
+                                    log.write(ex.ToString());
+                                }
+                                
+                                // Check if the dictionary is empty or not 
+                                if (wordDict.Count > 0)
+                                {
+                                    // Start sql transaction
+                                    InsertOrUpdateReverseIndex(sqlConnection, wordDict);
+                                    // Finally Close the sql connection
+                                    sqlConnection.Close();
+                                }
+
                             }
-
-                            FileHelper file = new FileHelper();
-                            wordDict = file.ParseDocuments(filePaths, sqlConnection, wordDict);
-
-                            // Check if the dictionary is empty or not 
-                            if (wordDict.Count > 0)
-                            {
-                                // Start sql transaction
-                                InsertOrUpdateReverseIndex(sqlConnection, wordDict);
-                                // Finally Close the sql connection
-                                sqlConnection.Close();
-                            }
-
                         }
                     }
                 }
             }
+            catch(Exception ex)
+            {
+                log.write(ex.ToString());
+            }
+            
 
         }
 
