@@ -27,7 +27,7 @@ namespace Crawler
             Logger log = new Logger(Path.GetDirectoryName(Application.ExecutablePath) + @"\log.txt");
             List<string> fileTypes = new List<string>();
             fileTypes.Add("*.txt");
-            //fileTypes.Add("*.html");
+            fileTypes.Add("*.html");
 
             try
             {
