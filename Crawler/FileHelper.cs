@@ -18,7 +18,7 @@ namespace Crawler
             string[] stopWords = new string[] { ",", ".", ";", ":", "'", "\"", "\\", "/", "|", "_", "-", "(", ")" };
             string sql = string.Empty;
             SQLiteCommand command;
-
+            
             foreach (string filePath in filePaths)
             {
                 if (!isIndexedInDatabase(filePath, sqlConnection))
@@ -47,7 +47,7 @@ namespace Crawler
                         word = RemoveStopWords(word, stopWords);
                         word = StripHTML(word);
                         word = RemoveUnicode(word);
-
+                        
                         if (!ContainsUnicodeCharacter(word) && !string.IsNullOrWhiteSpace(word))
                         {
                             if (wordDict.ContainsKey(word))
