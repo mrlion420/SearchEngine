@@ -27,7 +27,7 @@ namespace Crawler
             Logger log = new Logger(Path.GetDirectoryName(Application.ExecutablePath) + @"\log.txt");
             List<string> fileTypes = new List<string>();
             fileTypes.Add("*.txt");
-            fileTypes.Add("*.html");
+            //fileTypes.Add("*.html");
 
             try
             {
@@ -176,7 +176,11 @@ namespace Crawler
                         {
                             position = reader.GetString(1);
                         }
-
+                        if (key.Equals("this"))
+                        {
+                            log.write(key + "--->" + value);
+                        }
+                        
                         if (!string.IsNullOrEmpty(position))
                         {
                             result = position + ";" + value;
@@ -193,7 +197,7 @@ namespace Crawler
                     }
                     catch (Exception ex)
                     {
-                        log.write(ex.ToString());
+                        
                     }
                 }
                 transaction.Commit();
@@ -205,7 +209,7 @@ namespace Crawler
         {
             return string.Join("", str.Split(default(string[]), StringSplitOptions.RemoveEmptyEntries));
         }
-
+         
         private bool ContainsUnicodeCharacter(string input)
         {
             const int MaxAnsiCode = 255;

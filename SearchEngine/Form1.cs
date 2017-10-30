@@ -20,20 +20,68 @@ namespace SearchEngine
         {
             InitializeComponent();
         }
+        public string RemoveStopWords(string word, string[] stopWords)
+        {
+            foreach (string stopWord in stopWords)
+            {
+                if (word.Contains(stopWord))
+                {
+                    word = word.Replace(stopWord, string.Empty);
+                }
+            }
 
+            return word;
+        }
         private void Form1_Load(object sender, EventArgs e)
         {
-            
+            int documentId = 0;
+            Dictionary<string, string> wordDict = new Dictionary<string, string>();
+            string[] stringArray = File.ReadAllText(@"C:\Alex Hand Over\Handover\Source Code\Software\Web Service\FMCC_Data_Receiver\Deployment\FMCC_Data_Receiver.deploy-readme.txt").Split(' ');
+            HashSet<string> isDocumentIdInsertedForWord = new HashSet<string>();
+            string[] stopWords = new string[] { ",", ".", ";", ":", "'", "\"", "\\", "/", "|", "_", "-", "(", ")", "\r\n", "\r", "\n" };
+            for (int i = 0; i < stringArray.Length; i++)
+            {
+                
+                string resultString = string.Empty;
+                string word = stringArray[i].ToLower();
+                word = RemoveStopWords(word, stopWords);
+                //word = StripHTML(word);
+                //word = RemoveUnicode(word);
+
+                if ( !string.IsNullOrWhiteSpace(word))
+                {
+                    if (wordDict.ContainsKey(word))
+                    {
+                        if (isDocumentIdInsertedForWord.Contains(word))
+                        {
+                            resultString = ", " + i;
+                        }
+                        else
+                        {
+                            resultString = ";" + documentId + ":" + i;
+                            isDocumentIdInsertedForWord.Add(word);
+                        }
+                        // += the resulting string
+                        wordDict[word] += resultString;
+                    }
+                    else
+                    {
+                        resultString = documentId + ":" + i;
+                        wordDict.Add(word, resultString);
+                        isDocumentIdInsertedForWord.Add(word);
+                    }
+                }
+            }
 
         }
 
         public void calculateVectorSpace(List<List<string>> TF_IDF_List, string wordToBeRemoved, List<string> exactWordList)
         {
             
-            List<string> firstPhraseTestData = new List<string>();
-            firstPhraseTestData.Add("apple:0.5;1:1.20329;8:0.45318;54:1.0125");
-            firstPhraseTestData.Add("orange:0.5;1:0.12347;201:0.64792;356:1.72453;60:1.203;55:1.022");
-            TF_IDF_List.Add(firstPhraseTestData);
+            //List<string> firstPhraseTestData = new List<string>();
+            //firstPhraseTestData.Add("apple:0.5;1:1.20329;8:0.45318;54:1.0125");
+            //firstPhraseTestData.Add("orange:0.5;1:0.12347;201:0.64792;356:1.72453;60:1.203;55:1.022");
+            //TF_IDF_List.Add(firstPhraseTestData);
 
             // To store all the queries and its cosine values for every document
             // e.g. Phrase(string) Dict(documentId, cosineValue)
@@ -107,12 +155,25 @@ namespace SearchEngine
                 }
                 cosineValueDictForPhrase.Add(cosineForDocumentsDict);
             }
+
+            foreach(Dictionary<double,double> phraseDict in cosineValueDictForPhrase)
+            {
+                var sortedKeyValue = phraseDict.OrderByDescending(x => x.Value);
+                resultGV.DataSource = sortedKeyValue;
+                foreach(KeyValuePair<double,double> resultPair in sortedKeyValue)
+                {
+
+                }
+            }
+            
         }
 
         private void btnSearch_Click(object sender, EventArgs e)
         {
             string searchKeyWord = textBox1.Text;
             List<List<string>> scoreList = findKeyword(searchKeyWord);
+            calculateVectorSpace(scoreList, "", null);
+
             string li = "";
             foreach (List<string> scl in scoreList)
             {

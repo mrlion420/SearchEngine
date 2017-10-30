@@ -15,7 +15,7 @@ namespace Crawler
         
         public Dictionary<string, string> ParseDocuments(List<string> filePaths, SQLiteConnection sqlConnection, Dictionary<string, string> wordDict)
         {
-            string[] stopWords = new string[] { ",", ".", ";", ":", "'", "\"", "\\", "/", "|", "_", "-", "(", ")" };
+            string[] stopWords = new string[] { ",", ".", ";", ":", "'", "\"", "\\", "/", "|", "_", "-", "(", ")" , "\r\n" , "\r" , "\n" , "\t" };
             string sql = string.Empty;
             SQLiteCommand command;
             

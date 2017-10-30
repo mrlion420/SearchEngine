@@ -1313,3 +1313,174 @@ Removing EventLog source Crawler.
 Service Crawler is being removed from the system...
 Service Crawler was successfully removed from the system.
 Attempt to stop service Crawler.
+Uninstalling assembly 'C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.InstallLog
+   assemblypath = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe
+Removing EventLog source Crawler.
+Warning: The source Crawler is not registered on the local machine.
+Service Crawler is being removed from the system...
+An exception occurred during the uninstallation of the System.ServiceProcess.ServiceInstaller installer.
+System.ComponentModel.Win32Exception: The specified service does not exist as an installed service
+An exception occurred while uninstalling. This exception will be ignored and the uninstall will continue. However, the application might not be fully uninstalled after the uninstall is complete.
+Installing assembly 'C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.InstallLog
+   assemblypath = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe
+Installing service Crawler...
+Service Crawler has been successfully installed.
+Creating EventLog source Crawler in log Application...
+Committing assembly 'C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.InstallLog
+   assemblypath = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe
+Uninstalling assembly 'C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.InstallLog
+   assemblypath = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe
+Removing EventLog source Crawler.
+Service Crawler is being removed from the system...
+Service Crawler was successfully removed from the system.
+Installing assembly 'C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.InstallLog
+   assemblypath = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe
+Installing service Crawler...
+Service Crawler has been successfully installed.
+Creating EventLog source Crawler in log Application...
+Committing assembly 'C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.InstallLog
+   assemblypath = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe
+Uninstalling assembly 'C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.InstallLog
+   assemblypath = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe
+Removing EventLog source Crawler.
+Service Crawler is being removed from the system...
+Service Crawler was successfully removed from the system.
+Installing assembly 'C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.InstallLog
+   assemblypath = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe
+Installing service Crawler...
+Service Crawler has been successfully installed.
+Creating EventLog source Crawler in log Application...
+Committing assembly 'C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.InstallLog
+   assemblypath = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe
+Uninstalling assembly 'C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.InstallLog
+   assemblypath = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe
+Removing EventLog source Crawler.
+Service Crawler is being removed from the system...
+Service Crawler was successfully removed from the system.
+Installing assembly 'C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.InstallLog
+   assemblypath = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe
+Installing service Crawler...
+Service Crawler has been successfully installed.
+Creating EventLog source Crawler in log Application...
+Committing assembly 'C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.InstallLog
+   assemblypath = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe
+Uninstalling assembly 'C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.InstallLog
+   assemblypath = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe
+Removing EventLog source Crawler.
+Service Crawler is being removed from the system...
+Service Crawler was successfully removed from the system.
+Installing assembly 'C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.InstallLog
+   assemblypath = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe
+Installing service Crawler...
+Service Crawler has been successfully installed.
+Creating EventLog source Crawler in log Application...
+Committing assembly 'C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.InstallLog
+   assemblypath = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe
+Uninstalling assembly 'C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.InstallLog
+   assemblypath = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe
+Removing EventLog source Crawler.
+Service Crawler is being removed from the system...
+Service Crawler was successfully removed from the system.
+Installing assembly 'C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.InstallLog
+   assemblypath = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe
+Installing service Crawler...
+Service Crawler has been successfully installed.
+Creating EventLog source Crawler in log Application...
+Committing assembly 'C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.InstallLog
+   assemblypath = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe
+Uninstalling assembly 'C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.InstallLog
+   assemblypath = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe
+Removing EventLog source Crawler.
+Service Crawler is being removed from the system...
+Service Crawler was successfully removed from the system.
+Installing assembly 'C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.InstallLog
+   assemblypath = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe
+Installing service Crawler...
+Service Crawler has been successfully installed.
+Creating EventLog source Crawler in log Application...
+Committing assembly 'C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.InstallLog
+   assemblypath = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe
+Uninstalling assembly 'C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.InstallLog
+   assemblypath = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe
+Removing EventLog source Crawler.
+Service Crawler is being removed from the system...
+Service Crawler was successfully removed from the system.
+Installing assembly 'C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.InstallLog
+   assemblypath = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe
+Installing service Crawler...
+Service Crawler has been successfully installed.
+Creating EventLog source Crawler in log Application...
+Committing assembly 'C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.InstallLog
+   assemblypath = C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\Crawler\bin\Debug\Crawler.exe
