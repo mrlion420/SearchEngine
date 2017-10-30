@@ -29,7 +29,7 @@ namespace SearchEngine
 
         public void calculateVectorSpace(List<List<string>> TF_IDF_List, string wordToBeRemoved, List<string> exactWordList)
         {
-            List<List<string>> TF_IDF_List = new List<List<string>>();
+            
             List<string> firstPhraseTestData = new List<string>();
             firstPhraseTestData.Add("apple:0.5;1:1.20329;8:0.45318;54:1.0125");
             firstPhraseTestData.Add("orange:0.5;1:0.12347;201:0.64792;356:1.72453;60:1.203;55:1.022");
