@@ -21,7 +21,7 @@ namespace Crawler
             
             foreach (string filePath in filePaths)
             {
-                if (!isIndexedInDatabase(filePath, sqlConnection))
+                if (!isIndexedInDatabse(filePath, sqlConnection))
                 {
                     long documentId = 0;
                     HashSet<string> isDocumentIdInsertedForWord = new HashSet<string>();

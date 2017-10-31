@@ -1,0 +1,26 @@
+System.InvalidOperationException: Database is not open
+   at System.Data.SQLite.SQLiteCommand.InitializeForReader()
+   at System.Data.SQLite.SQLiteCommand.ExecuteReader(CommandBehavior behavior)
+   at System.Data.SQLite.SQLiteCommand.ExecuteReader()
+   at SearchEngine.FileHelper.isIndexedInDatabase(String filePath, SQLiteConnection sqlConnection) in C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\SearchEngine\FileHelper.cs:line 95
+   at SearchEngine.FileHelper.ParseDocuments(List`1 filePaths, SQLiteConnection sqlConnection, Dictionary`2 wordDict, Form1 form) in C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\SearchEngine\FileHelper.cs:line 25
+   at SearchEngine.Form1.CrawlData(List`1 filePaths, String pattern) in C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\SearchEngine\Search Engine.cs:line 285
+System.Data.SQLite.SQLiteException (0x80004005): SQL logic error or missing database
+no such table: documents
+   at System.Data.SQLite.SQLite3.Prepare(SQLiteConnection cnn, String strSql, SQLiteStatement previous, UInt32 timeoutMS, String& strRemain)
+   at System.Data.SQLite.SQLiteCommand.BuildNextCommand()
+   at System.Data.SQLite.SQLiteCommand.GetStatement(Int32 index)
+   at System.Data.SQLite.SQLiteDataReader.NextResult()
+   at System.Data.SQLite.SQLiteDataReader..ctor(SQLiteCommand cmd, CommandBehavior behave)
+   at System.Data.SQLite.SQLiteCommand.ExecuteReader(CommandBehavior behavior)
+   at System.Data.SQLite.SQLiteCommand.ExecuteReader()
+   at SearchEngine.FileHelper.isIndexedInDatabase(String filePath, SQLiteConnection sqlConnection) in C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\SearchEngine\FileHelper.cs:line 95
+   at SearchEngine.FileHelper.ParseDocuments(List`1 filePaths, SQLiteConnection sqlConnection, Dictionary`2 wordDict, Form1 form) in C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\SearchEngine\FileHelper.cs:line 25
+   at SearchEngine.Form1.CrawlData(List`1 filePaths, String pattern) in C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\SearchEngine\Search Engine.cs:line 285
+System.InvalidOperationException: Database is not open
+   at System.Data.SQLite.SQLiteCommand.InitializeForReader()
+   at System.Data.SQLite.SQLiteCommand.ExecuteReader(CommandBehavior behavior)
+   at System.Data.SQLite.SQLiteCommand.ExecuteReader()
+   at SearchEngine.FileHelper.isIndexedInDatabase(String filePath, SQLiteConnection sqlConnection) in C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\SearchEngine\FileHelper.cs:line 95
+   at SearchEngine.FileHelper.ParseDocuments(List`1 filePaths, SQLiteConnection sqlConnection, Dictionary`2 wordDict, Form1 form) in C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\SearchEngine\FileHelper.cs:line 25
+   at SearchEngine.Form1.CrawlData(List`1 filePaths, String pattern) in C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\SearchEngine\Search Engine.cs:line 285

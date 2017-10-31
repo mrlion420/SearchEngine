@@ -22,6 +22,7 @@ namespace SearchEngine
         private Logger log = new Logger(Path.GetDirectoryName(Application.ExecutablePath) + @"\log.txt");
         private static int totalFileCount = 0;
         private static double lastValue = 1;
+        private double lastCount = 0;
 
         AutoResetEvent resetEvent = new AutoResetEvent(false);
         
@@ -54,12 +55,15 @@ namespace SearchEngine
             //CheckForIllegalCrossThreadCalls = false;
         }
 
-        public static void UpdateProgressBar(double value)
+        public void UpdateProgressBar(double value)
         {
-            double currentValue = lastValue;
-            double result = ((currentValue + value) / totalFileCount) * 100;
-            lastValue = result;
-            //progressBar.Value = Convert.ToInt32(result);
+            Invoke(new Action(() =>
+            {
+                lastCount++;
+                double result = ((lastCount ) / totalFileCount) * 100;
+                lastValue = result;
+                progressBar.Value = Convert.ToInt32(result);
+            }));
         }
 
         private void btnSearch_Click(object sender, EventArgs e)
@@ -279,7 +283,7 @@ namespace SearchEngine
             FileHelper file = new FileHelper();
             try
             {
-                wordDict = file.ParseDocuments(filePaths, sqlConnection, wordDict, totalFileCount);
+                wordDict = file.ParseDocuments(filePaths, sqlConnection, wordDict, this);
             }
             catch (Exception ex)
             {

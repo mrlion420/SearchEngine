@@ -13,7 +13,7 @@ namespace SearchEngine
     public class FileHelper
     {
         
-        public Dictionary<string, string> ParseDocuments(List<string> filePaths, SQLiteConnection sqlConnection, Dictionary<string, string> wordDict,double totalFiles)
+        public Dictionary<string, string> ParseDocuments(List<string> filePaths, SQLiteConnection sqlConnection, Dictionary<string, string> wordDict,Form1 form)
         {
             string[] stopWords = new string[] { ",", ".", ";", ":", "'", "\"", "\\", "/", "|", "_", "-", "(", ")" , "\r\n" , "\r" , "\n" , "\t" };
             string sql = string.Empty;
@@ -75,6 +75,7 @@ namespace SearchEngine
                     }
                 }
                 //Form1.UpdateProgressBar(count);
+                form.UpdateProgressBar(count);
                 
             }
 
