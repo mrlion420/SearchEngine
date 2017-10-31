@@ -175,11 +175,7 @@ namespace Crawler
                         while (reader.Read())
                         {
                             position = reader.GetString(1);
-                        }
-                        if (key.Equals("this"))
-                        {
-                            log.write(key + "--->" + value);
-                        }
+                        }                      
                         
                         if (!string.IsNullOrEmpty(position))
                         {
