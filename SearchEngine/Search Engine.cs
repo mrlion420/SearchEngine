@@ -20,8 +20,7 @@ namespace SearchEngine
         private string selectedPath = string.Empty;
         private List<string> fileTypes = new List<string>();
         private Logger log = new Logger(Path.GetDirectoryName(Application.ExecutablePath) + @"\log.txt");
-        private static int totalFileCount = 0;
-        private static double lastValue = 1;
+        private int totalFileCount = 0;
         private double lastCount = 0;
 
         AutoResetEvent resetEvent = new AutoResetEvent(false);
@@ -52,16 +51,22 @@ namespace SearchEngine
             fileTypes.Add("*.txt");
             fileTypes.Add("*.html");
             fileTypes.Add("*.cs");
+
+            string dbName = Path.GetDirectoryName(Application.ExecutablePath) + @"\searchEngine.db";
+            // Check if database exists or not
+            if (!File.Exists(dbName))
+            {
+                InitializeDatabase(dbName);
+            }
             //CheckForIllegalCrossThreadCalls = false;
         }
 
-        public void UpdateProgressBar(double value)
+        public void UpdateProgressBar()
         {
             Invoke(new Action(() =>
             {
                 lastCount++;
-                double result = ((lastCount ) / totalFileCount) * 100;
-                lastValue = result;
+                double result = ((lastCount) / totalFileCount) * 100;
                 progressBar.Value = Convert.ToInt32(result);
             }));
         }
@@ -110,6 +115,7 @@ namespace SearchEngine
                 Thread thread = new Thread(() => FileCrawler(fileType));
                 thread.IsBackground = true;
                 thread.Start();
+                Thread.Sleep(500);
             }
         }
 
@@ -130,8 +136,6 @@ namespace SearchEngine
             text = "Crawling for " + fileType + " has finished.";
             resetEvent.Set();
             UpdateText(text);
-            
-           
         }
 
         public List<List<string>> findKeyword(string word)
@@ -525,6 +529,7 @@ namespace SearchEngine
 
             }
             sqlConnection = new SQLiteConnection("DataSource=" + databaseName);
+            sqlConnection.Open();
 
             return sqlConnection;
         }

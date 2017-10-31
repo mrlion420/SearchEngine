@@ -18,10 +18,10 @@ namespace SearchEngine
             string[] stopWords = new string[] { ",", ".", ";", ":", "'", "\"", "\\", "/", "|", "_", "-", "(", ")" , "\r\n" , "\r" , "\n" , "\t" };
             string sql = string.Empty;
             SQLiteCommand command;
-            int count = 0;
+            
             foreach (string filePath in filePaths)
             {
-                count++;
+                
                 if (!isIndexedInDatabase(filePath, sqlConnection))
                 {
                     long documentId = 0;
@@ -74,8 +74,8 @@ namespace SearchEngine
                         }
                     }
                 }
-                //Form1.UpdateProgressBar(count);
-                form.UpdateProgressBar(count);
+                
+                form.UpdateProgressBar();
                 
             }
 
