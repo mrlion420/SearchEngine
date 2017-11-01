@@ -74,8 +74,13 @@ namespace SearchEngine
         private void btnSearch_Click(object sender, EventArgs e)
         {
             string searchKeyWord = searchTxtBx.Text;
+            string wordToBeRemoved = string.Empty;
+            List<string> exactWordList = new List<string>();
+
             List<List<string>> scoreList = findKeyword(searchKeyWord);
-            calculateVectorSpace(scoreList, "", null);
+            BindComboxBox(scoreList);
+            List<Dictionary<double,double>> cosineDict = calculateVectorSpace(scoreList);
+            SortAndBindData(cosineDict, 0, wordToBeRemoved, exactWordList);
 
             string li = "";
             foreach (List<string> scl in scoreList)
@@ -87,9 +92,6 @@ namespace SearchEngine
                 li = li + "---";
             }
             //textBox2.Text = li;
-
-            // Calculate Vector space 
-            // Pass the 3 variables to the above method
         }
 
         private void btnBrowse_Click(object sender, EventArgs e)
@@ -98,6 +100,7 @@ namespace SearchEngine
             if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(folderBrowserDialog.SelectedPath))
             {
                 selectedPath = folderBrowserDialog.SelectedPath;
+                crawlLocationTxtbx.Text = selectedPath;
             }
         }
 
@@ -115,7 +118,6 @@ namespace SearchEngine
                 Thread thread = new Thread(() => FileCrawler(fileType));
                 thread.IsBackground = true;
                 thread.Start();
-                Thread.Sleep(500);
             }
         }
 
@@ -327,6 +329,11 @@ namespace SearchEngine
                 string[] queryArr = { arrA[0] + " " + arrB[1] + arrC[0], arrA[0] + " " + arrB[1] + arrC[1] };
                 return queryArr;
             }
+            else if (word.Contains("|"))
+            {
+                string[] queryArr = word.Split('|');
+                return queryArr;
+            }
             else
             {
                 string[] queryArr = { word };
@@ -372,7 +379,29 @@ namespace SearchEngine
             return word;
         }
 
-        public void calculateVectorSpace(List<List<string>> TF_IDF_List, string wordToBeRemoved, List<string> exactWordList)
+        public void BindComboxBox(List<List<string>> phraseList)
+        {
+            searchQueryComboBox.Items.Clear();
+            foreach(List<string> wordList in phraseList)
+            {
+                string searchQuery = string.Empty;
+                foreach (string word in wordList)
+                {
+                    string singleWord = word.Split(';')[0].Split(':')[0];
+                    searchQuery += singleWord + " ";
+                }
+                searchQueryComboBox.Items.Add(searchQuery);
+            }
+            searchQueryComboBox.SelectedIndex = 0;
+        }
+
+        public string GetFileName(string filePath)
+        {
+            string fileName = filePath.Substring(filePath.LastIndexOf('\\') + 1);
+            return fileName;
+        }
+
+        public List<Dictionary<double, double>> calculateVectorSpace(List<List<string>> TF_IDF_List)
         {
 
             // To store all the queries and its cosine values for every document
@@ -448,8 +477,14 @@ namespace SearchEngine
                 cosineValueDictForPhrase.Add(cosineForDocumentsDict);
             }
 
+            return cosineValueDictForPhrase;
+        }
+
+        public void SortAndBindData(List<Dictionary<double,double>> cosineValueDictForPhrase,int comboBoxId, string wordToBeRemoved, List<string> exactWordList)
+        {
             DataTable resultTable = new DataTable();
             resultTable.Columns.Add("No.");
+            resultTable.Columns.Add("File Name");
             resultTable.Columns.Add("File Location");
             int count = 1;
             string dbName = Path.GetDirectoryName(Application.ExecutablePath) + @"\searchEngine.db";
@@ -461,21 +496,22 @@ namespace SearchEngine
                 var sortedKeyValue = phraseDict.OrderByDescending(x => x.Value);
                 foreach (KeyValuePair<double, double> resultPair in sortedKeyValue)
                 {
-                    string fileName = string.Empty;
+                    string filePath = string.Empty;
                     string sql = "select documentName from documents where documentId = " + resultPair.Key;
                     SQLiteCommand command = new SQLiteCommand(sql, sqlConnection);
                     SQLiteDataReader reader = command.ExecuteReader();
                     while (reader.Read())
                     {
-                        fileName = reader.GetString(0);
+                        filePath = reader.GetString(0);
                     }
-                    resultTable.Rows.Add(count, fileName);
+                    string fileName = GetFileName(filePath);
+                    resultTable.Rows.Add(count, fileName, filePath);
                     count++;
                 }
 
                 resultGV.DataSource = resultTable;
+                resultGV.Columns[2].Width = 600;
             }
-
         }
 
         private List<string> GetFiles(string path, string pattern)
