@@ -130,12 +130,13 @@
             // 
             // searchQueryComboBox
             // 
+            this.searchQueryComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.searchQueryComboBox.FormattingEnabled = true;
             this.searchQueryComboBox.Location = new System.Drawing.Point(93, 317);
             this.searchQueryComboBox.Name = "searchQueryComboBox";
             this.searchQueryComboBox.Size = new System.Drawing.Size(713, 21);
             this.searchQueryComboBox.TabIndex = 10;
-            this.searchQueryComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.searchQueryComboBox.SelectedIndexChanged += new System.EventHandler(this.searchQueryComboBox_SelectedIndexChanged);
             // 
             // label1
             // 

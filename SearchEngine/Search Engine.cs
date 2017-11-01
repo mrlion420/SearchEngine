@@ -23,6 +23,10 @@ namespace SearchEngine
         private int totalFileCount = 0;
         private double lastCount = 0;
 
+        private List<Dictionary<double, double>> cosineDict = new List<Dictionary<double, double>>();
+        private string wordToBeRemoved = string.Empty;
+        private List<string> exactWordList = new List<string>();
+
         AutoResetEvent resetEvent = new AutoResetEvent(false);
         
         public Form1()
@@ -74,13 +78,11 @@ namespace SearchEngine
         private void btnSearch_Click(object sender, EventArgs e)
         {
             string searchKeyWord = searchTxtBx.Text;
-            string wordToBeRemoved = string.Empty;
-            List<string> exactWordList = new List<string>();
-
+            exactWordList = GetExactWordList(searchKeyWord);
             List<List<string>> scoreList = findKeyword(searchKeyWord);
+            cosineDict = calculateVectorSpace(scoreList);
             BindComboxBox(scoreList);
-            List<Dictionary<double,double>> cosineDict = calculateVectorSpace(scoreList);
-            SortAndBindData(cosineDict, 0, wordToBeRemoved, exactWordList);
+            //SortAndBindData(cosineDict, 0, wordToBeRemoved, exactWordList);
 
             string li = "";
             foreach (List<string> scl in scoreList)
@@ -121,9 +123,14 @@ namespace SearchEngine
             }
         }
 
+        private void searchQueryComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            SortAndBindData(cosineDict, searchQueryComboBox.SelectedIndex, wordToBeRemoved, exactWordList);
+        }
+
         #region Utility Methods
 
-        public void FileCrawler(string fileType)
+        private void FileCrawler(string fileType)
         {
             string text = "Started Crawling for file type -> " + fileType;
             resetEvent.Set();
@@ -140,7 +147,7 @@ namespace SearchEngine
             UpdateText(text);
         }
 
-        public List<List<string>> findKeyword(string word)
+        private List<List<string>> findKeyword(string word)
         {
             List<List<string>> tfIdfScoreList = new List<List<string>>();
             List<string> seperatedScore;
@@ -266,7 +273,7 @@ namespace SearchEngine
 
         }
 
-        public void CrawlData(List<string> filePaths , string pattern)
+        private void CrawlData(List<string> filePaths , string pattern)
         {
             Dictionary<string, string> wordDict = new Dictionary<string, string>();
             Dictionary<string, bool> isDocumentIdInsertedDict = new Dictionary<string, bool>();
@@ -307,7 +314,7 @@ namespace SearchEngine
             
         }
 
-        public double getQueryTfVal(string word, string[] words)
+        private double getQueryTfVal(string word, string[] words)
         {
             double tf = 0.0;
             int cun = 0;
@@ -319,7 +326,7 @@ namespace SearchEngine
             return tf;
         }
 
-        public string[] getOrQuery(string word)
+        private string[] getOrQuery(string word)
         {
             if (word.Contains("(") && word.Contains("|") && word.Contains(")"))
             {
@@ -342,7 +349,7 @@ namespace SearchEngine
 
         }
 
-        public string[] removeSpaceItem(string[] arr)
+        private string[] removeSpaceItem(string[] arr)
         {
             int cun = 0;
             foreach (string w in arr)
@@ -366,7 +373,7 @@ namespace SearchEngine
             return newArr;
         }
 
-        public string RemoveStopWords(string word, string[] stopWords)
+        private string RemoveStopWords(string word, string[] stopWords)
         {
             foreach (string stopWord in stopWords)
             {
@@ -379,7 +386,7 @@ namespace SearchEngine
             return word;
         }
 
-        public void BindComboxBox(List<List<string>> phraseList)
+        private void BindComboxBox(List<List<string>> phraseList)
         {
             searchQueryComboBox.Items.Clear();
             foreach(List<string> wordList in phraseList)
@@ -395,13 +402,43 @@ namespace SearchEngine
             searchQueryComboBox.SelectedIndex = 0;
         }
 
-        public string GetFileName(string filePath)
+        private string GetFileName(string filePath)
         {
             string fileName = filePath.Substring(filePath.LastIndexOf('\\') + 1);
             return fileName;
         }
 
-        public List<Dictionary<double, double>> calculateVectorSpace(List<List<string>> TF_IDF_List)
+        private string GetWordToBeRemoved(string query)
+        {
+            string resultWord = string.Empty;
+            string[] words = query.Split('/');
+            foreach(string singleWord in words)
+            {
+                if (singleWord.Contains('/'))
+                {
+                    resultWord = singleWord.Substring(singleWord.IndexOf('/') + 1);
+                }
+            }
+
+            return resultWord;
+        }
+
+        private List<string> GetExactWordList(string query)
+        {
+            List<string> resultWordList = new List<string>();
+            int count = query.Count(x => x == '"');
+            if(count == 2)
+            {
+                int firstIndex = query.IndexOf('"');
+                int lastIndex = query.LastIndexOf('"');
+                int length = lastIndex - firstIndex;
+                string resultWord = query.Substring(firstIndex + 1, length - 1);
+                resultWordList = resultWord.Split(' ').ToList();
+            }
+            return resultWordList;
+        }
+
+        private List<Dictionary<double, double>> calculateVectorSpace(List<List<string>> TF_IDF_List)
         {
 
             // To store all the queries and its cosine values for every document
@@ -480,7 +517,7 @@ namespace SearchEngine
             return cosineValueDictForPhrase;
         }
 
-        public void SortAndBindData(List<Dictionary<double,double>> cosineValueDictForPhrase,int comboBoxId, string wordToBeRemoved, List<string> exactWordList)
+        private void SortAndBindData(List<Dictionary<double,double>> cosineValueDictForPhrase,int comboBoxId, string wordToBeRemoved, List<string> exactWordList)
         {
             DataTable resultTable = new DataTable();
             resultTable.Columns.Add("No.");
@@ -491,27 +528,26 @@ namespace SearchEngine
             var sqlConnection = new SQLiteConnection("DataSource=" + dbName);
             sqlConnection.Open();
 
-            foreach (Dictionary<double, double> phraseDict in cosineValueDictForPhrase)
+            var phraseDict = cosineValueDictForPhrase[comboBoxId];
+            var sortedKeyValue = phraseDict.OrderByDescending(x => x.Value);
+            foreach (KeyValuePair<double, double> resultPair in sortedKeyValue)
             {
-                var sortedKeyValue = phraseDict.OrderByDescending(x => x.Value);
-                foreach (KeyValuePair<double, double> resultPair in sortedKeyValue)
+                string filePath = string.Empty;
+                string sql = "select documentName from documents where documentId = " + resultPair.Key;
+                SQLiteCommand command = new SQLiteCommand(sql, sqlConnection);
+                SQLiteDataReader reader = command.ExecuteReader();
+                while (reader.Read())
                 {
-                    string filePath = string.Empty;
-                    string sql = "select documentName from documents where documentId = " + resultPair.Key;
-                    SQLiteCommand command = new SQLiteCommand(sql, sqlConnection);
-                    SQLiteDataReader reader = command.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        filePath = reader.GetString(0);
-                    }
-                    string fileName = GetFileName(filePath);
-                    resultTable.Rows.Add(count, fileName, filePath);
-                    count++;
+                    filePath = reader.GetString(0);
                 }
-
-                resultGV.DataSource = resultTable;
-                resultGV.Columns[2].Width = 600;
+                string fileName = GetFileName(filePath);
+                resultTable.Rows.Add(count, fileName, filePath);
+                count++;
             }
+
+            resultGV.DataSource = resultTable;
+            resultGV.Columns[2].Width = 600;
+           
         }
 
         private List<string> GetFiles(string path, string pattern)
@@ -570,7 +606,7 @@ namespace SearchEngine
             return sqlConnection;
         }
 
-        public void InsertOrUpdateReverseIndex(SQLiteConnection sqlConnection, Dictionary<string, string> wordDict)
+        private void InsertOrUpdateReverseIndex(SQLiteConnection sqlConnection, Dictionary<string, string> wordDict)
         {
             Logger log = new Logger(Path.GetDirectoryName(Application.ExecutablePath) + @"\log.txt");
 
@@ -641,6 +677,5 @@ namespace SearchEngine
 
         #endregion
 
-        
     }
 }
