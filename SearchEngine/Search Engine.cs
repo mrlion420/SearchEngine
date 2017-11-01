@@ -78,7 +78,9 @@ namespace SearchEngine
         private void btnSearch_Click(object sender, EventArgs e)
         {
             string searchKeyWord = searchTxtBx.Text;
-            exactWordList = GetExactWordList(searchKeyWord);
+            exactWordList = GetAndRemoveExactWordList(ref searchKeyWord);
+            wordToBeRemoved = GetAndRemoveWordToBeRemoved(ref searchKeyWord);
+
             List<List<string>> scoreList = findKeyword(searchKeyWord);
             cosineDict = calculateVectorSpace(scoreList);
             BindComboxBox(scoreList);
@@ -408,22 +410,24 @@ namespace SearchEngine
             return fileName;
         }
 
-        private string GetWordToBeRemoved(string query)
+        private string GetAndRemoveWordToBeRemoved(ref string query)
         {
             string resultWord = string.Empty;
-            string[] words = query.Split('/');
+            string[] words = query.Split(' ');
             foreach(string singleWord in words)
             {
                 if (singleWord.Contains('/'))
                 {
                     resultWord = singleWord.Substring(singleWord.IndexOf('/') + 1);
+                    query = query.Replace(singleWord, string.Empty);
                 }
             }
+            
 
             return resultWord;
         }
 
-        private List<string> GetExactWordList(string query)
+        private List<string> GetAndRemoveExactWordList(ref string query)
         {
             List<string> resultWordList = new List<string>();
             int count = query.Count(x => x == '"');
@@ -433,6 +437,7 @@ namespace SearchEngine
                 int lastIndex = query.LastIndexOf('"');
                 int length = lastIndex - firstIndex;
                 string resultWord = query.Substring(firstIndex + 1, length - 1);
+                query = query.Replace('"', ' ');
                 resultWordList = resultWord.Split(' ').ToList();
             }
             return resultWordList;
