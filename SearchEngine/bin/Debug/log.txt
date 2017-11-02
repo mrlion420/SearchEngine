@@ -1,0 +1,8 @@
+System.ObjectDisposedException: Cannot access a disposed object.
+Object name: 'Form1'.
+   at System.Windows.Forms.Control.MarshaledInvoke(Control caller, Delegate method, Object[] args, Boolean synchronous)
+   at System.Windows.Forms.Control.Invoke(Delegate method, Object[] args)
+   at System.Windows.Forms.Control.Invoke(Delegate method)
+   at SearchEngine.Form1.UpdateProgressBar() in C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\SearchEngine\Search Engine.cs:line 74
+   at SearchEngine.FileHelper.ParseDocuments(List`1 filePaths, SQLiteConnection sqlConnection, Dictionary`2 wordDict, Form1 form) in C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\SearchEngine\FileHelper.cs:line 78
+   at SearchEngine.Form1.CrawlData(List`1 filePaths, String pattern) in C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\SearchEngine\Search Engine.cs:line 328

@@ -44,14 +44,16 @@
             this.crawlerLocationLbl = new System.Windows.Forms.Label();
             this.crawlLocationTxtbx = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.resetDatabaseChkBx = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.resultGV)).BeginInit();
             this.SuspendLayout();
             // 
             // searchTxtBx
             // 
-            this.searchTxtBx.Location = new System.Drawing.Point(12, 291);
+            this.searchTxtBx.Location = new System.Drawing.Point(127, 291);
             this.searchTxtBx.Name = "searchTxtBx";
-            this.searchTxtBx.Size = new System.Drawing.Size(794, 20);
+            this.searchTxtBx.Size = new System.Drawing.Size(679, 20);
             this.searchTxtBx.TabIndex = 0;
             // 
             // btnSearch
@@ -77,6 +79,7 @@
             this.eventTxtBx.Location = new System.Drawing.Point(127, 105);
             this.eventTxtBx.Multiline = true;
             this.eventTxtBx.Name = "eventTxtBx";
+            this.eventTxtBx.ReadOnly = true;
             this.eventTxtBx.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.eventTxtBx.Size = new System.Drawing.Size(679, 106);
             this.eventTxtBx.TabIndex = 4;
@@ -113,9 +116,9 @@
             // 
             // progressBar
             // 
-            this.progressBar.Location = new System.Drawing.Point(106, 240);
+            this.progressBar.Location = new System.Drawing.Point(127, 240);
             this.progressBar.Name = "progressBar";
-            this.progressBar.Size = new System.Drawing.Size(700, 26);
+            this.progressBar.Size = new System.Drawing.Size(679, 26);
             this.progressBar.TabIndex = 8;
             // 
             // lblSearchEngine
@@ -132,9 +135,9 @@
             // 
             this.searchQueryComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.searchQueryComboBox.FormattingEnabled = true;
-            this.searchQueryComboBox.Location = new System.Drawing.Point(93, 317);
+            this.searchQueryComboBox.Location = new System.Drawing.Point(127, 317);
             this.searchQueryComboBox.Name = "searchQueryComboBox";
-            this.searchQueryComboBox.Size = new System.Drawing.Size(713, 21);
+            this.searchQueryComboBox.Size = new System.Drawing.Size(679, 21);
             this.searchQueryComboBox.TabIndex = 10;
             this.searchQueryComboBox.SelectedIndexChanged += new System.EventHandler(this.searchQueryComboBox_SelectedIndexChanged);
             // 
@@ -143,9 +146,9 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(14, 321);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(72, 13);
+            this.label1.Size = new System.Drawing.Size(109, 13);
             this.label1.TabIndex = 11;
-            this.label1.Text = "Search Query";
+            this.label1.Text = "Current Search Query";
             // 
             // progressLbl
             // 
@@ -167,9 +170,9 @@
             // 
             // crawlLocationTxtbx
             // 
-            this.crawlLocationTxtbx.Enabled = false;
             this.crawlLocationTxtbx.Location = new System.Drawing.Point(127, 39);
             this.crawlLocationTxtbx.Name = "crawlLocationTxtbx";
+            this.crawlLocationTxtbx.ReadOnly = true;
             this.crawlLocationTxtbx.Size = new System.Drawing.Size(679, 20);
             this.crawlLocationTxtbx.TabIndex = 14;
             // 
@@ -182,12 +185,33 @@
             this.label3.TabIndex = 16;
             this.label3.Text = "Crawler Log";
             // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(14, 296);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(44, 13);
+            this.label2.TabIndex = 17;
+            this.label2.Text = "Search ";
+            // 
+            // resetDatabaseChkBx
+            // 
+            this.resetDatabaseChkBx.AutoSize = true;
+            this.resetDatabaseChkBx.Location = new System.Drawing.Point(331, 82);
+            this.resetDatabaseChkBx.Name = "resetDatabaseChkBx";
+            this.resetDatabaseChkBx.Size = new System.Drawing.Size(103, 17);
+            this.resetDatabaseChkBx.TabIndex = 18;
+            this.resetDatabaseChkBx.Text = "Reset Database";
+            this.resetDatabaseChkBx.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AcceptButton = this.btnSearch;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(918, 623);
+            this.Controls.Add(this.resetDatabaseChkBx);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.crawlLocationTxtbx);
             this.Controls.Add(this.crawlerLocationLbl);
@@ -204,7 +228,7 @@
             this.Controls.Add(this.btnSearch);
             this.Controls.Add(this.searchTxtBx);
             this.Name = "Form1";
-            this.Text = "Progress";
+            this.Text = "Search Engine";
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.resultGV)).EndInit();
             this.ResumeLayout(false);
@@ -230,6 +254,8 @@
         private System.Windows.Forms.Label crawlerLocationLbl;
         private System.Windows.Forms.TextBox crawlLocationTxtbx;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.CheckBox resetDatabaseChkBx;
     }
 }
 

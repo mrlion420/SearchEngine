@@ -22,7 +22,9 @@ namespace SearchEngine
         private Logger log = new Logger(Path.GetDirectoryName(Application.ExecutablePath) + @"\log.txt");
         private int totalFileCount = 0;
         private double lastCount = 0;
+        private bool firstTimeLoad = true;
 
+        private List<Thread> threadList = new List<Thread>();
         private List<Dictionary<double, double>> cosineDict = new List<Dictionary<double, double>>();
         private string wordToBeRemoved = string.Empty;
         private List<string> exactWordList = new List<string>();
@@ -60,8 +62,10 @@ namespace SearchEngine
             // Check if database exists or not
             if (!File.Exists(dbName))
             {
-                InitializeDatabase(dbName);
+                SQLiteConnection sqlConnection =  InitializeDatabase(dbName);
+                sqlConnection.Close();
             }
+
             //CheckForIllegalCrossThreadCalls = false;
         }
 
@@ -110,6 +114,28 @@ namespace SearchEngine
 
         private void btnCrawl_Click(object sender, EventArgs e)
         {
+            try
+            {
+                if(progressBar.Value != 100 && !firstTimeLoad)
+                {
+                    UpdateEventTextBox("Please wait until the crawling is finished");
+                    return;
+                }
+                if (resetDatabaseChkBx.Checked)
+                {
+                    string dbName = Path.GetDirectoryName(Application.ExecutablePath) + @"\searchEngine.db";
+                    if (File.Exists(dbName))
+                    {
+                        UpdateEventTextBox("Database Deleted");
+                        File.Delete(dbName);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                log.write(ex.ToString());
+            }
+            firstTimeLoad = false;
             UpdateEventTextBox("Crawl Location - " + selectedPath);
             foreach(string fileType in fileTypes)
             {
@@ -122,6 +148,7 @@ namespace SearchEngine
                 Thread thread = new Thread(() => FileCrawler(fileType));
                 thread.IsBackground = true;
                 thread.Start();
+                threadList.Add(thread);
             }
         }
 
@@ -147,6 +174,7 @@ namespace SearchEngine
             text = "Crawling for " + fileType + " has finished.";
             resetEvent.Set();
             UpdateText(text);
+            threadList.Remove(Thread.CurrentThread);
         }
 
         private List<List<string>> findKeyword(string word)
@@ -533,6 +561,7 @@ namespace SearchEngine
             var sqlConnection = new SQLiteConnection("DataSource=" + dbName);
             sqlConnection.Open();
 
+            // Get the phrase dict with respective combo box id
             var phraseDict = cosineValueDictForPhrase[comboBoxId];
             var sortedKeyValue = phraseDict.OrderByDescending(x => x.Value);
             foreach (KeyValuePair<double, double> resultPair in sortedKeyValue)
