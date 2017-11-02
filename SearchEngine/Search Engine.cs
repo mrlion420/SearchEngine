@@ -48,7 +48,7 @@ namespace SearchEngine
         {
             Invoke(new Action(() =>
             {
-                eventTxtBx.Text += message + Environment.NewLine;
+                eventTxtBx.AppendText(message + Environment.NewLine);
             }));
         }
         
@@ -76,6 +76,7 @@ namespace SearchEngine
                 lastCount++;
                 double result = ((lastCount) / totalFileCount) * 100;
                 progressBar.Value = Convert.ToInt32(result);
+                percentageLbl.Text = Convert.ToInt32(result) + "%";
             }));
         }
 
@@ -128,6 +129,8 @@ namespace SearchEngine
                     {
                         UpdateEventTextBox("Database Deleted");
                         File.Delete(dbName);
+                        var sqlConnection = InitializeDatabase(dbName);
+                        sqlConnection.Close();
                     }
                 }
             }
@@ -135,6 +138,7 @@ namespace SearchEngine
             {
                 log.write(ex.ToString());
             }
+
             firstTimeLoad = false;
             UpdateEventTextBox("Crawl Location - " + selectedPath);
             foreach(string fileType in fileTypes)
@@ -142,13 +146,18 @@ namespace SearchEngine
                 List<string> filePaths = GetFiles(selectedPath, fileType);
                 totalFileCount += filePaths.Count;
             }
+
+            if(totalFileCount == 0)
+            {
+                progressBar.Value = 100;
+            }
             
             foreach (string fileType in fileTypes)
             {
                 Thread thread = new Thread(() => FileCrawler(fileType));
                 thread.IsBackground = true;
                 thread.Start();
-                threadList.Add(thread);
+                
             }
         }
 
@@ -174,7 +183,7 @@ namespace SearchEngine
             text = "Crawling for " + fileType + " has finished.";
             resetEvent.Set();
             UpdateText(text);
-            threadList.Remove(Thread.CurrentThread);
+            
         }
 
         private List<List<string>> findKeyword(string word)
@@ -205,6 +214,7 @@ namespace SearchEngine
                     allDocList.Add(allDocIdList);
                     noOfTotalDoc++;
                 }
+                reader1.Close();
 
                 string[] queryArr = getOrQuery(word);
 
@@ -231,6 +241,7 @@ namespace SearchEngine
                         {
                             position = reader.GetString(0);
                         }
+                        reader.Close();
                         if (!String.Equals(position, ""))
                         {
                             string[] docArr = position.Split(';');
@@ -305,43 +316,46 @@ namespace SearchEngine
 
         private void CrawlData(List<string> filePaths , string pattern)
         {
-            Dictionary<string, string> wordDict = new Dictionary<string, string>();
-            Dictionary<string, bool> isDocumentIdInsertedDict = new Dictionary<string, bool>();
-            SQLiteConnection sqlConnection;
+            try
+            {
+                Dictionary<string, string> wordDict = new Dictionary<string, string>();
+                Dictionary<string, bool> isDocumentIdInsertedDict = new Dictionary<string, bool>();
+                SQLiteConnection sqlConnection;
 
-            string dbName = Path.GetDirectoryName(Application.ExecutablePath) + @"\searchEngine.db";
-            // Check if database exists or not
-            if (!File.Exists(dbName))
-            {
-                sqlConnection = InitializeDatabase(dbName);
-            }
-            else
-            {
+                string dbName = Path.GetDirectoryName(Application.ExecutablePath) + @"\searchEngine.db";
+
                 // Connect to Database if database exists
                 sqlConnection = new SQLiteConnection("DataSource=" + dbName);
                 sqlConnection.Open();
 
-            }
+                FileHelper file = new FileHelper();
+                try
+                {
+                    wordDict = file.ParseDocuments(filePaths, sqlConnection, wordDict, this);
+                }
+                catch (Exception ex)
+                {
+                    log.write(ex.ToString());
+                }
 
-            FileHelper file = new FileHelper();
-            try
-            {
-                wordDict = file.ParseDocuments(filePaths, sqlConnection, wordDict, this);
+                // Check if the dictionary is empty or not 
+                if (wordDict.Count > 0)
+                {
+                    // Start sql transaction
+                    InsertOrUpdateReverseIndex(sqlConnection, wordDict);
+                    // Finally Close the sql connection
+                }
+
+                sqlConnection.Close();
+                sqlConnection.Dispose();
+                GC.Collect();
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 log.write(ex.ToString());
             }
+           
 
-            // Check if the dictionary is empty or not 
-            if (wordDict.Count > 0)
-            {
-                // Start sql transaction
-                InsertOrUpdateReverseIndex(sqlConnection, wordDict);
-                // Finally Close the sql connection
-                sqlConnection.Close();
-            }
-            
         }
 
         private double getQueryTfVal(string word, string[] words)
@@ -574,6 +588,7 @@ namespace SearchEngine
                 {
                     filePath = reader.GetString(0);
                 }
+                reader.Close();
                 string fileName = GetFileName(filePath);
                 resultTable.Rows.Add(count, fileName, filePath);
                 count++;
@@ -581,7 +596,7 @@ namespace SearchEngine
 
             resultGV.DataSource = resultTable;
             resultGV.Columns[2].Width = 600;
-           
+            sqlConnection.Close();
         }
 
         private List<string> GetFiles(string path, string pattern)
@@ -601,7 +616,7 @@ namespace SearchEngine
 
         protected SQLiteConnection InitializeDatabase(string databaseName)
         {
-            SQLiteConnection sqlConnection;
+            SQLiteConnection sqlConnection = new SQLiteConnection();
             try
             {
                 SQLiteConnection.CreateFile(databaseName);
@@ -634,8 +649,6 @@ namespace SearchEngine
             {
 
             }
-            sqlConnection = new SQLiteConnection("DataSource=" + databaseName);
-            sqlConnection.Open();
 
             return sqlConnection;
         }
@@ -667,6 +680,7 @@ namespace SearchEngine
                         {
                             position = reader.GetString(1);
                         }
+                        reader.Close();
 
                         if (!string.IsNullOrEmpty(position))
                         {
@@ -681,6 +695,7 @@ namespace SearchEngine
 
                         command = new SQLiteCommand(sql, sqlConnection);
                         command.ExecuteNonQuery();
+                        
                     }
                     catch (Exception ex)
                     {

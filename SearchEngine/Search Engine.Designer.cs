@@ -46,6 +46,8 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.resetDatabaseChkBx = new System.Windows.Forms.CheckBox();
+            this.divider = new System.Windows.Forms.Label();
+            this.percentageLbl = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.resultGV)).BeginInit();
             this.SuspendLayout();
             // 
@@ -116,7 +118,7 @@
             // 
             // progressBar
             // 
-            this.progressBar.Location = new System.Drawing.Point(127, 240);
+            this.progressBar.Location = new System.Drawing.Point(127, 220);
             this.progressBar.Name = "progressBar";
             this.progressBar.Size = new System.Drawing.Size(679, 26);
             this.progressBar.TabIndex = 8;
@@ -125,7 +127,7 @@
             // 
             this.lblSearchEngine.AutoSize = true;
             this.lblSearchEngine.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblSearchEngine.Location = new System.Drawing.Point(13, 266);
+            this.lblSearchEngine.Location = new System.Drawing.Point(9, 262);
             this.lblSearchEngine.Name = "lblSearchEngine";
             this.lblSearchEngine.Size = new System.Drawing.Size(128, 22);
             this.lblSearchEngine.TabIndex = 9;
@@ -153,7 +155,7 @@
             // progressLbl
             // 
             this.progressLbl.AutoSize = true;
-            this.progressLbl.Location = new System.Drawing.Point(14, 245);
+            this.progressLbl.Location = new System.Drawing.Point(14, 225);
             this.progressLbl.Name = "progressLbl";
             this.progressLbl.Size = new System.Drawing.Size(86, 13);
             this.progressLbl.TabIndex = 12;
@@ -188,7 +190,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(14, 296);
+            this.label2.Location = new System.Drawing.Point(12, 296);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(44, 13);
             this.label2.TabIndex = 17;
@@ -204,12 +206,30 @@
             this.resetDatabaseChkBx.Text = "Reset Database";
             this.resetDatabaseChkBx.UseVisualStyleBackColor = true;
             // 
+            // divider
+            // 
+            this.divider.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.divider.Location = new System.Drawing.Point(0, 258);
+            this.divider.Name = "divider";
+            this.divider.Size = new System.Drawing.Size(915, 2);
+            this.divider.TabIndex = 19;
+            // 
+            // percentageLbl
+            // 
+            this.percentageLbl.AutoSize = true;
+            this.percentageLbl.Location = new System.Drawing.Point(819, 226);
+            this.percentageLbl.Name = "percentageLbl";
+            this.percentageLbl.Size = new System.Drawing.Size(0, 13);
+            this.percentageLbl.TabIndex = 20;
+            // 
             // Form1
             // 
             this.AcceptButton = this.btnSearch;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(918, 623);
+            this.Controls.Add(this.percentageLbl);
+            this.Controls.Add(this.divider);
             this.Controls.Add(this.resetDatabaseChkBx);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label3);
@@ -256,6 +276,8 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.CheckBox resetDatabaseChkBx;
+        private System.Windows.Forms.Label divider;
+        private System.Windows.Forms.Label percentageLbl;
     }
 }
 
