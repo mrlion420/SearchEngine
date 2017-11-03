@@ -124,19 +124,21 @@ namespace SearchEngine
                 }
                 if (resetDatabaseChkBx.Checked)
                 {
-                    string dbName = Path.GetDirectoryName(Application.ExecutablePath) + @"\searchEngine.db";
-                    if (File.Exists(dbName))
-                    {
-                        UpdateEventTextBox("Database Deleted");
-                        File.Delete(dbName);
-                        var sqlConnection = InitializeDatabase(dbName);
-                        sqlConnection.Close();
-                    }
+                   
                 }
             }
             catch (Exception ex)
             {
                 log.write(ex.ToString());
+            }
+
+            string dbName = Path.GetDirectoryName(Application.ExecutablePath) + @"\searchEngine.db";
+            if (File.Exists(dbName))
+            {
+                UpdateEventTextBox("Database Deleted");
+                File.Delete(dbName);
+                var sqlConnection = InitializeDatabase(dbName);
+                sqlConnection.Close();
             }
 
             firstTimeLoad = false;
@@ -577,6 +579,132 @@ namespace SearchEngine
 
             // Get the phrase dict with respective combo box id
             var phraseDict = cosineValueDictForPhrase[comboBoxId];
+            var cloneDict = phraseDict.ToDictionary(entry => entry.Key,
+                                               entry => entry.Value);
+            // Removing string that is to be removed
+            foreach(KeyValuePair<double,double> kvp in cloneDict)
+            {
+                string sql = "select position from reverseIndex where term ='" + wordToBeRemoved + "'";
+                SQLiteCommand command = new SQLiteCommand(sql, sqlConnection);
+                SQLiteDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    string[] documentArray = reader.GetString(0).Split(';');
+                    foreach(string document in documentArray)
+                    {
+                        double documentId = Convert.ToDouble(document.Split(':')[0]);
+                        string[] positionArray = document.Split(':')[1].Split(',');
+                        if(documentId == kvp.Key)
+                        {
+                            phraseDict.Remove(kvp.Key);
+                        }
+                    }
+                }
+                reader.Close();
+            }
+
+            // Only use exact word search logic when there is more than 1 word
+            if(exactWordList.Count > 2)
+            {
+                // Re-clone the dict
+                cloneDict = phraseDict.ToDictionary(entry => entry.Key,
+                                               entry => entry.Value);
+                // Loop all documents
+                foreach (KeyValuePair<double, double> kvp in cloneDict)
+                {
+                    // Checking exact word list
+                    List<string[]> listOfPosition = new List<string[]>();
+                    // Loop each exact word
+                    // To get all the words' position in the document
+                    foreach (string exactWord in exactWordList)
+                    {
+                        string sql = "select position from reverseIndex where term='" + exactWord + "'";
+
+                        using (SQLiteCommand command = new SQLiteCommand(sql, sqlConnection))
+                        {
+                            using (SQLiteDataReader reader = command.ExecuteReader())
+                            {
+                                string[] documentArray = new string[] { };
+                                while (reader.Read())
+                                {
+                                    documentArray = reader.GetString(0).Split(';');
+                                }
+                                
+                                foreach (string document in documentArray)
+                                {
+                                    double documentId = Convert.ToDouble(document.Split(':')[0]);
+                                    string[] positionArray = document.Split(':')[1].Split(',');
+                                    if (documentId == kvp.Key)
+                                    {
+                                        listOfPosition.Add(positionArray);
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+
+                    // If all the words are found in the document
+                    // Make sure all the words are in correct order
+                    int matchingIndexCount = 0;
+                    if (listOfPosition.Count == exactWordList.Count)
+                    {
+                        string[] firstPositionArray = listOfPosition[0];
+                        for (int i = 0; i < firstPositionArray.Length; i++)
+                        {
+                            int firstPosition = Convert.ToInt32(firstPositionArray[i]);
+                            int lastSubSequentPosition = firstPosition;
+                            for (int j = 1; j < listOfPosition.Count; j++)
+                            {
+                                string[] subsequentPositionArray = listOfPosition[j];
+                                for (int k = 0; k < subsequentPositionArray.Length; k++)
+                                {
+                                    int subsequentPosition = Convert.ToInt32(subsequentPositionArray[k]);
+                                    if (subsequentPosition - lastSubSequentPosition == 1)
+                                    {
+                                        lastSubSequentPosition = subsequentPosition; // Update the last subsequent position
+                                        matchingIndexCount++;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Remove the document if there is no match
+                    if (matchingIndexCount != exactWordList.Count)
+                    {
+                        phraseDict.Remove(kvp.Key);
+                    }
+                }
+            }
+            else if(exactWordList.Count == 1)
+            {
+                // Re-clone the dict
+                cloneDict = phraseDict.ToDictionary(entry => entry.Key,
+                                               entry => entry.Value);
+                foreach (KeyValuePair<double, double> kvp in cloneDict)
+                {
+                    string sql = "select position from reverseIndex where term ='" + exactWordList[0] + "'";
+                    SQLiteCommand command = new SQLiteCommand(sql, sqlConnection);
+                    SQLiteDataReader reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        string[] documentArray = reader.GetString(0).Split(';');
+                        foreach (string document in documentArray)
+                        {
+                            double documentId = Convert.ToDouble(document.Split(':')[0]);
+                            string[] positionArray = document.Split(':')[1].Split(',');
+                            if (documentId == kvp.Key)
+                            {
+                                phraseDict.Remove(kvp.Key);
+                            }
+                        }
+                    }
+                    reader.Close();
+                }
+            }
+            
             var sortedKeyValue = phraseDict.OrderByDescending(x => x.Value);
             foreach (KeyValuePair<double, double> resultPair in sortedKeyValue)
             {
@@ -597,6 +725,7 @@ namespace SearchEngine
             resultGV.DataSource = resultTable;
             resultGV.Columns[2].Width = 600;
             sqlConnection.Close();
+            GC.Collect();
         }
 
         private List<string> GetFiles(string path, string pattern)

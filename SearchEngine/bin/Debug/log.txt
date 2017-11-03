@@ -3,13 +3,3 @@ System.IO.IOException: The process cannot access the file 'C:\Users\User\Documen
    at System.IO.File.InternalDelete(String path, Boolean checkHost)
    at System.IO.File.Delete(String path)
    at SearchEngine.Form1.btnCrawl_Click(Object sender, EventArgs e) in C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\SearchEngine\Search Engine.cs:line 131
-System.IO.IOException: The process cannot access the file 'C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\SearchEngine\bin\Debug\searchEngine.db' because it is being used by another process.
-   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
-   at System.IO.File.InternalDelete(String path, Boolean checkHost)
-   at System.IO.File.Delete(String path)
-   at SearchEngine.Form1.btnCrawl_Click(Object sender, EventArgs e) in C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\SearchEngine\Search Engine.cs:line 131
-System.IO.IOException: The process cannot access the file 'C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\SearchEngine\bin\Debug\searchEngine.db' because it is being used by another process.
-   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
-   at System.IO.File.InternalDelete(String path, Boolean checkHost)
-   at System.IO.File.Delete(String path)
-   at SearchEngine.Form1.btnCrawl_Click(Object sender, EventArgs e) in C:\Users\User\Documents\Visual Studio 2017\Projects\SearchEngine\SearchEngine\Search Engine.cs:line 131

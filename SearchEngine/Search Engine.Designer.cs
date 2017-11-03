@@ -205,6 +205,7 @@
             this.resetDatabaseChkBx.TabIndex = 18;
             this.resetDatabaseChkBx.Text = "Reset Database";
             this.resetDatabaseChkBx.UseVisualStyleBackColor = true;
+            this.resetDatabaseChkBx.Visible = false;
             // 
             // divider
             // 
