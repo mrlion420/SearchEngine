@@ -603,6 +603,7 @@ namespace SearchEngine
                 reader.Close();
             }
 
+            Dictionary<double,double> phraseExactDict = new Dictionary<double, double>();
             // Only use exact word search logic when there is more than 1 word
             if(exactWordList.Count > 2)
             {
@@ -677,12 +678,15 @@ namespace SearchEngine
                         phraseDict.Remove(kvp.Key);
                     }
                 }
+                phraseExactDict = phraseDict.ToDictionary(entry => entry.Key,
+                                               entry => entry.Value);
             }
             else if(exactWordList.Count == 1)
             {
                 // Re-clone the dict
                 cloneDict = phraseDict.ToDictionary(entry => entry.Key,
                                                entry => entry.Value);
+                
                 foreach (KeyValuePair<double, double> kvp in cloneDict)
                 {
                     string sql = "select position from reverseIndex where term ='" + exactWordList[0] + "'";
@@ -697,7 +701,7 @@ namespace SearchEngine
                             string[] positionArray = document.Split(':')[1].Split(',');
                             if (documentId == kvp.Key)
                             {
-                                phraseDict.Remove(kvp.Key);
+                                phraseExactDict.Add(kvp.Key, kvp.Value);
                             }
                         }
                     }
@@ -705,7 +709,7 @@ namespace SearchEngine
                 }
             }
             
-            var sortedKeyValue = phraseDict.OrderByDescending(x => x.Value);
+            var sortedKeyValue = phraseExactDict.OrderByDescending(x => x.Value);
             foreach (KeyValuePair<double, double> resultPair in sortedKeyValue)
             {
                 string filePath = string.Empty;
