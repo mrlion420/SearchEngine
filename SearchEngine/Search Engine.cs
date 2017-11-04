@@ -64,6 +64,9 @@ namespace SearchEngine
             {
                 SQLiteConnection sqlConnection =  InitializeDatabase(dbName);
                 sqlConnection.Close();
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                SQLiteConnection.ClearAllPools();
             }
 
             //CheckForIllegalCrossThreadCalls = false;
@@ -136,9 +139,16 @@ namespace SearchEngine
             if (File.Exists(dbName))
             {
                 UpdateEventTextBox("Database Deleted");
-                File.Delete(dbName);
-                var sqlConnection = InitializeDatabase(dbName);
+                SQLiteConnection sqlConnection = new SQLiteConnection("DataSource=" + dbName);
+                sqlConnection.Open();
                 sqlConnection.Close();
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                File.Delete(dbName);
+                sqlConnection = InitializeDatabase(dbName);
+                sqlConnection.Close();
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
             }
 
             firstTimeLoad = false;
@@ -291,6 +301,9 @@ namespace SearchEngine
                 }
 
                 sqlConnection.Close();
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                SQLiteConnection.ClearAllPools();
             }
             catch (Exception ex)
             {
@@ -351,6 +364,8 @@ namespace SearchEngine
                 sqlConnection.Close();
                 sqlConnection.Dispose();
                 GC.Collect();
+                GC.WaitForPendingFinalizers();
+                SQLiteConnection.ClearAllPools();
             }
             catch(Exception ex)
             {
@@ -708,7 +723,10 @@ namespace SearchEngine
                     reader.Close();
                 }
             }
-            
+
+            phraseExactDict = phraseDict.ToDictionary(entry => entry.Key,
+                                               entry => entry.Value);
+
             var sortedKeyValue = phraseExactDict.OrderByDescending(x => x.Value);
             foreach (KeyValuePair<double, double> resultPair in sortedKeyValue)
             {
@@ -729,7 +747,9 @@ namespace SearchEngine
             resultGV.DataSource = resultTable;
             resultGV.Columns[2].Width = 600;
             sqlConnection.Close();
+            SQLiteConnection.ClearAllPools();
             GC.Collect();
+            GC.WaitForPendingFinalizers();
         }
 
         private List<string> GetFiles(string path, string pattern)
