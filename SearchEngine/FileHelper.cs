@@ -27,7 +27,7 @@ namespace SearchEngine
                     long documentId = 0;
                     HashSet<string> isDocumentIdInsertedForWord = new HashSet<string>();
 
-                    string[] stringArray = File.ReadAllText(filePath).Split(' ');
+                    string[] stringArray = File.ReadAllText(filePath).Replace(Environment.NewLine, " ").Split(' ');
 
                     sql = "insert into documents (documentName, totalWords) values ('" + filePath + "'," + stringArray.Length + ")";
                     command = new SQLiteCommand(sql, sqlConnection);
