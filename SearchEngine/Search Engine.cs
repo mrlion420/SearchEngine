@@ -472,18 +472,41 @@ namespace SearchEngine
         private string GetAndRemoveWordToBeRemoved(ref string query)
         {
             string resultWord = string.Empty;
-            string[] words = query.Split(' ');
-            foreach(string singleWord in words)
-            {
-                if (singleWord.Contains('\\'))
-                {
-                    resultWord = singleWord.Substring(singleWord.IndexOf('\\') + 1);
-                    query = query.Replace(singleWord, string.Empty);
-                }
-            }
+            int firstIndex = query.IndexOf('\\');
+            string[] holderstring = query.Substring(firstIndex + 2).Split(' ');
+
+            string word = holderstring[0];
+            word = word.Replace(" ", string.Empty);
+            resultWord = word;
+            //string[] words = query.Split(' ');
+            //foreach(string singleWord in words)
+            //{
+            //    if (singleWord.Contains('\\'))
+            //    {
+            //        resultWord = singleWord.Substring(singleWord.IndexOf('\\') + 1);
+            //        query = query.Replace(singleWord, string.Empty);
+            //    }
+            //}
             
 
             return resultWord;
+        }
+
+        public int GetNthIndex(string s, char t, int n)
+        {
+            int count = 0;
+            for (int i = 0; i < s.Length; i++)
+            {
+                if (s[i] == t)
+                {
+                    count++;
+                    if (count == n)
+                    {
+                        return i;
+                    }
+                }
+            }
+            return -1;
         }
 
         private List<string> GetAndRemoveExactWordList(ref string query)
