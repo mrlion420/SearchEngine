@@ -475,9 +475,9 @@ namespace SearchEngine
             string[] words = query.Split(' ');
             foreach(string singleWord in words)
             {
-                if (singleWord.Contains('/'))
+                if (singleWord.Contains('\\'))
                 {
-                    resultWord = singleWord.Substring(singleWord.IndexOf('/') + 1);
+                    resultWord = singleWord.Substring(singleWord.IndexOf('\\') + 1);
                     query = query.Replace(singleWord, string.Empty);
                 }
             }
@@ -620,7 +620,7 @@ namespace SearchEngine
 
             Dictionary<double,double> phraseExactDict = new Dictionary<double, double>();
             // Only use exact word search logic when there is more than 1 word
-            if(exactWordList.Count > 2)
+            if(exactWordList.Count > 1)
             {
                 // Re-clone the dict
                 cloneDict = phraseDict.ToDictionary(entry => entry.Key,
@@ -662,7 +662,7 @@ namespace SearchEngine
 
                     // If all the words are found in the document
                     // Make sure all the words are in correct order
-                    int matchingIndexCount = 0;
+                    int matchingIndexCount = 1;
                     if (listOfPosition.Count == exactWordList.Count)
                     {
                         string[] firstPositionArray = listOfPosition[0];
