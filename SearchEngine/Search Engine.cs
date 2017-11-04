@@ -86,6 +86,10 @@ namespace SearchEngine
         private void btnSearch_Click(object sender, EventArgs e)
         {
             string searchKeyWord = searchTxtBx.Text.ToLower();
+            if (string.IsNullOrWhiteSpace(searchKeyWord))
+            {
+                return;
+            }
             exactWordList = GetAndRemoveExactWordList(ref searchKeyWord);
             wordToBeRemoved = GetAndRemoveWordToBeRemoved(ref searchKeyWord);
 
