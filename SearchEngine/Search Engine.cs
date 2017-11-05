@@ -129,9 +129,10 @@ namespace SearchEngine
                     UpdateEventTextBox("Please wait until the crawling is finished");
                     return;
                 }
-                if (resetDatabaseChkBx.Checked)
+                if (string.IsNullOrEmpty(crawlLocationTxtbx.Text))
                 {
-                   
+                    UpdateEventTextBox("Please choose location to index");
+                    return;
                 }
             }
             catch (Exception ex)
