@@ -40,7 +40,17 @@ namespace SearchEngine
                     {
                         documentId = Convert.ToInt64(reader["documentId"]);
                     }
-
+                    int index = filePath.LastIndexOf('\\');
+                    int secondIndex = filePath.LastIndexOf('.');
+                    string fileName = filePath.Substring(index + 1, secondIndex - index - 1);
+                    string[] fileNameArray = fileName.Split(' ');
+                    List<string> holder = stringArray.ToList();
+                    foreach (string fileNameWord in fileNameArray)
+                    {
+                        holder.Add(fileNameWord);
+                    }
+                    
+                    stringArray = holder.ToArray();
                     for (int i = 0; i < stringArray.Length; i++)
                     {
                         string resultString = string.Empty;
